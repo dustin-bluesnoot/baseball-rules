@@ -89,20 +89,23 @@ html { scroll-behavior: smooth; }
 }
 
 /* ── Rulebook layout ── */
-/* #sidebar and #main are direct children of body in rulebook mode,
-   so display:flex here correctly lays them side by side. */
+/* Classic fixed-sidebar layout — far more reliable than flexbox for this pattern */
 body.rulebook-mode {
-  display: flex;
   font-family: 'Source Serif 4', Georgia, serif;
   background: var(--cream); color: var(--text);
   min-height: 100vh; font-size: 15px; line-height: 1.7;
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar — fixed position, full height ── */
 #sidebar {
-  width: var(--sidebar-w); min-width: var(--sidebar-w);
-  background: var(--navy); height: 100vh; position: sticky; top: 0;
-  overflow-y: auto; display: flex; flex-direction: column; z-index: 100;
+  position: fixed;
+  left: 0; top: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--navy);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  z-index: 100;
   scrollbar-width: thin; scrollbar-color: var(--navy-mid) var(--navy);
 }
 #sidebar::-webkit-scrollbar { width: 4px; }
@@ -196,10 +199,12 @@ body.rulebook-mode {
 }
 .taba-nav-link:hover { color: var(--gold-light); }
 
-/* ── Main content ── */
+/* ── Main content — offset by sidebar width ── */
 #main {
-  flex: 1; min-width: 0; padding: 0 2.5rem 4rem;
-  max-width: 880px;
+  margin-left: var(--sidebar-w);
+  min-width: 0;
+  padding: 0 2.5rem 4rem;
+  max-width: calc(880px + var(--sidebar-w));
 }
 
 /* ── Cover ── */
@@ -461,16 +466,13 @@ footer a { color: var(--gold); text-decoration: none; }
 /* ── Responsive ── */
 @media print {
   #sidebar { display: none; }
-  body.rulebook-mode { display: block; }
-  #main { padding: 0; max-width: 100%; }
+  #main { margin-left: 0; padding: 0; max-width: 100%; }
   .rule-body, .taba-rule-body { display: block !important; }
 }
 @media (max-width: 768px) {
-  :root { --sidebar-w: 220px; }
-  body.rulebook-mode { flex-direction: column; }
-  #sidebar { width: 100%; height: auto; position: static; }
-  #sidebar nav { display: none; }
-  #main { padding: 0 1rem 3rem; }
+  :root { --sidebar-w: 0px; }
+  #sidebar { display: none; }
+  #main { margin-left: 0; padding: 0 1rem 3rem; }
   .cover { margin: 0 -1rem 2rem; padding: 2.5rem 1rem 2rem; }
   .part-divider { margin: 2rem -1rem 1.5rem; padding: 1rem; }
   .diff-grid { grid-template-columns: 1fr; }
