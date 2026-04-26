@@ -181,6 +181,21 @@ body.rulebook-mode {
 .nav-plain a:hover { color: #fff; }
 .nav-plain a.has-override { border-left-color: var(--gold); color: rgba(255,210,80,.7); }
 
+/* TABA nav group */
+.taba-group-label { color: var(--gold) !important; }
+.taba-nav-group {
+  background: rgba(255,255,255,.04);
+  border-left: 3px solid var(--division-color);
+  margin: 0 0 .25rem 0;
+  padding: .3rem 0;
+}
+.taba-nav-link {
+  display: block; padding: .22rem 1rem .22rem 1.4rem;
+  color: rgba(255,210,80,.7); text-decoration: none; font-size: .72rem;
+  transition: color .12s;
+}
+.taba-nav-link:hover { color: var(--gold-light); }
+
 /* ── Main content ── */
 #main {
   flex: 1; min-width: 0; padding: 0 2.5rem 4rem;
@@ -256,7 +271,13 @@ body.rulebook-mode {
 }
 .rule-override-dot {
   width: 7px; height: 7px; border-radius: 50%; background: var(--gold);
-  flex-shrink: 0; title: "TABA local rule differs";
+  flex-shrink: 0;
+}
+.rule-override-flag {
+  font-family: 'DM Mono', monospace; font-size: .58rem; font-weight: 500;
+  background: var(--division-color); color: #fff;
+  padding: .1rem .45rem; border-radius: 3px; letter-spacing: .04em;
+  flex-shrink: 0; margin-left: auto; margin-right: .4rem;
 }
 .rule-chev {
   font-size: .65rem; color: var(--muted); transition: transform .25s; flex-shrink: 0;
@@ -272,12 +293,26 @@ body.rulebook-mode {
 /* ── Sub-rules ── */
 .sub-rule { margin-bottom: .95rem; padding-left: .8rem; border-left: 3px solid var(--rule-bdr); }
 .sub-rule:last-child { margin-bottom: 0; }
-.sub-rule.has-override { border-left-color: var(--gold); }
+/* Sub-rules with a TABA override get a prominent amber highlight */
+.sub-rule.has-override {
+  border-left: 4px solid var(--division-color);
+  background: #fffbf0;
+  border-radius: 0 4px 4px 0;
+  padding: .65rem .9rem .65rem .9rem;
+  margin-left: -.1rem;
+}
 .sub-rule-title {
   font-family: 'DM Mono', monospace; font-size: .72rem; font-weight: 500;
   color: var(--navy-mid); margin-bottom: .25rem;
   display: flex; align-items: center; flex-wrap: wrap; gap: .35rem;
 }
+/* Tag shown inline in the sub-rule title when TABA differs */
+.sub-rule-override-tag {
+  font-family: 'DM Mono', monospace; font-size: .58rem; font-weight: 500;
+  background: var(--division-color); color: #fff;
+  padding: .1rem .4rem; border-radius: 3px; letter-spacing: .04em;
+}
+.sub-rule-content { }
 
 /* ── Division override panel ── */
 .division-panel {
@@ -286,11 +321,12 @@ body.rulebook-mode {
 }
 .division-panel-header {
   background: var(--division-color); color: #fff;
-  font-family: 'DM Mono', monospace; font-size: .62rem; font-weight: 500;
-  padding: .28rem .7rem; letter-spacing: .07em;
+  font-family: 'DM Mono', monospace; font-size: .68rem; font-weight: 500;
+  padding: .5rem .9rem; letter-spacing: .06em;
   display: flex; align-items: center; justify-content: space-between;
   cursor: pointer; user-select: none;
 }
+.division-panel-header:hover { filter: brightness(1.1); }
 .division-panel-header .dp-label { display: flex; align-items: center; gap: .4rem; }
 .division-panel-header .dp-chev { font-size: .5rem; transition: transform .2s; }
 .division-panel.dp-open .dp-chev { transform: rotate(90deg); }
@@ -346,6 +382,7 @@ body.rulebook-mode {
   background: #fff;
 }
 .taba-rule-section.r-open .taba-rule-body { display: block; }
+.taba-rule-section.r-open .taba-rule-chev { transform: none; }
 
 /* ── Common content elements ── */
 p { margin-bottom: .5rem; font-size: .91rem; }
