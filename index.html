@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TABA Rulebook 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:wght@300;400;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <div id="loading">
+      <span class="load-icon">⚾</span>
+      <p>Loading rulebook…</p>
+    </div>
+  </div>
+
+  <!-- Data files — order matters -->
+  <script src="js/bc-minor-rules.js"></script>
+  <script src="js/taba-divisions.js"></script>
+  <script src="js/renderer.js"></script>
+
+  <script>
+    // Entry point — renderer.js exposes window.Rulebook
+    document.addEventListener('DOMContentLoaded', () => {
+      const params  = new URLSearchParams(window.location.search);
+      const division = params.get('division');
+      window.Rulebook.init(division);
+    });
+  </script>
+</body>
+</html>
