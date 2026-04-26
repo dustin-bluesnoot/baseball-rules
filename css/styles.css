@@ -89,16 +89,13 @@ html { scroll-behavior: smooth; }
 }
 
 /* ── Rulebook layout ── */
+/* #sidebar and #main are direct children of body in rulebook mode,
+   so display:flex here correctly lays them side by side. */
 body.rulebook-mode {
+  display: flex;
   font-family: 'Source Serif 4', Georgia, serif;
   background: var(--cream); color: var(--text);
   min-height: 100vh; font-size: 15px; line-height: 1.7;
-}
-/* #app is the actual flex container — sidebar and main are its children */
-body.rulebook-mode #app {
-  display: flex;
-  width: 100%;
-  min-height: 100vh;
 }
 
 /* ── Sidebar ── */
@@ -427,13 +424,13 @@ footer a { color: var(--gold); text-decoration: none; }
 /* ── Responsive ── */
 @media print {
   #sidebar { display: none; }
-  body.rulebook-mode #app { display: block; }
+  body.rulebook-mode { display: block; }
   #main { padding: 0; max-width: 100%; }
   .rule-body, .taba-rule-body { display: block !important; }
 }
 @media (max-width: 768px) {
   :root { --sidebar-w: 220px; }
-  body.rulebook-mode #app { flex-direction: column; }
+  body.rulebook-mode { flex-direction: column; }
   #sidebar { width: 100%; height: auto; position: static; }
   #sidebar nav { display: none; }
   #main { padding: 0 1rem 3rem; }
