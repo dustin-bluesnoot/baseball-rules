@@ -183,6 +183,80 @@ body.rulebook-mode {
 }
 .nav-plain a:hover { color: #fff; }
 .nav-plain a.has-override { border-left-color: var(--gold); color: rgba(255,210,80,.7); }
+/* ── Active nav link ── */
+nav a.nav-active { color: var(--gold-light) !important; font-weight: 600; }
+
+/* ── Search ── */
+.search-wrap {
+  padding: .6rem .9rem .4rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  flex-shrink: 0;
+}
+.search-box {
+  display: flex; align-items: center; gap: .4rem;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 5px; padding: .35rem .6rem;
+  transition: border-color .15s;
+}
+.search-box:focus-within {
+  border-color: var(--gold); background: rgba(255,255,255,.12);
+}
+.search-icon { color: rgba(255,255,255,.4); font-size: 1.1rem; flex-shrink:0; line-height:1; }
+.search-box input {
+  flex: 1; background: none; border: none; outline: none;
+  color: #fff; font-family: 'Source Serif 4', serif; font-size: .8rem;
+  placeholder-color: rgba(255,255,255,.35);
+}
+.search-box input::placeholder { color: rgba(255,255,255,.35); }
+.search-clear {
+  display: none; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,.4); font-size: .75rem; padding: 0;
+  width: 16px; height: 16px; flex-shrink: 0; border-radius: 50%;
+  transition: color .15s, background .15s;
+}
+.search-clear:hover { color: #fff; background: rgba(255,255,255,.15); }
+
+.search-results {
+  max-height: calc(100vh - 160px);
+  overflow-y: auto;
+  margin: .3rem -.9rem 0;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.1) transparent;
+}
+.search-count {
+  font-family: 'DM Mono', monospace; font-size: .58rem; letter-spacing: .1em;
+  color: rgba(255,255,255,.3); text-transform: uppercase;
+  padding: .5rem .9rem .25rem;
+}
+.search-result {
+  display: flex; align-items: baseline; gap: .5rem;
+  padding: .45rem .9rem; cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  transition: background .1s;
+}
+.search-result:hover, .search-result.sr-selected {
+  background: rgba(255,255,255,.08);
+}
+.sr-type {
+  font-family: 'DM Mono', monospace; font-size: .55rem; font-weight: 500;
+  padding: .08rem .35rem; border-radius: 2px; flex-shrink: 0;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.sr-type-rule    { background: rgba(255,255,255,.15); color: rgba(255,255,255,.7); }
+.sr-type-section { background: rgba(255,255,255,.08); color: rgba(255,255,255,.5); }
+.sr-type-taba    { background: var(--division-color); color: #fff; }
+.sr-type-differs { background: var(--diff-bdr); color: #fff; }
+.sr-title {
+  color: rgba(255,255,255,.75); font-size: .74rem; line-height: 1.3; flex: 1;
+}
+.sr-title mark {
+  background: rgba(212,160,23,.35); color: var(--gold-light);
+  border-radius: 2px; padding: 0 .1rem;
+}
+.search-empty {
+  padding: .8rem .9rem; color: rgba(255,255,255,.4); font-size: .78rem;
+}
 
 /* TABA nav group */
 .taba-group-label { color: var(--gold) !important; }
