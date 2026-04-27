@@ -22,12 +22,18 @@
   <script src="js/renderer.js"></script>
 
   <script>
-    // Entry point — renderer.js exposes window.Rulebook
-    document.addEventListener('DOMContentLoaded', () => {
-      const params  = new URLSearchParams(window.location.search);
+    // Scripts above are synchronous — DOM is already ready by this point.
+    // DOMContentLoaded has already fired, so we call init() directly.
+    // Guard with readyState check for safety in any future async loading.
+    (function() {
+      const params   = new URLSearchParams(window.location.search);
       const division = params.get('division');
-      window.Rulebook.init(division);
-    });
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => window.Rulebook.init(division));
+      } else {
+        window.Rulebook.init(division);
+      }
+    })();
   </script>
 </body>
 </html>
