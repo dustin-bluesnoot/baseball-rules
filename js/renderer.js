@@ -1,517 +1,241 @@
 /**
- * renderer.js
- * ───────────
- * Reads BCMinorRules + TABADivisions and builds the UI.
- * Never edit this file for content changes — edit the data files instead.
+ * taba-divisions.js
+ * ─────────────────
+ * Add or edit division overrides here.
+ * The renderer reads this file — never edit renderer.js for content changes.
+ *
+ * OVERRIDE TYPES:
+ *   "differs" → side-by-side comparison block (BC Minor left / TABA right)
+ *   "adds"    → green block for something TABA adds that BC Minor doesn't have
+ *   "removes" → red block for something TABA restricts beyond BC Minor
+ *
+ * Each override key matches a BC Minor rule `id` from bc-minor-rules.js.
+ * Each addition `insertAfterRule` value matches a BC Minor rule `id`.
  */
 
-window.Rulebook = (() => {
+window.TABADivisions = {
 
-  let currentDivision = null;
-  let divisionData    = null;
-  let searchIndex     = [];   // built at render time
+  /* ═══════════════════════════════════════════════════════════
+     11U — Mosquito
+     ═══════════════════════════════════════════════════════════ */
+  "11u": {
+    name: "11U — Mosquito",
+    badge: "11U Mosquito",
+    color: "#0c413b",
+    description: "Spring & Summer 2026",
 
-  // ─── Entry point ─────────────────────────────────────────
-  function init(divisionParam) {
-    const key = divisionParam ? divisionParam.toLowerCase() : null;
-    if (key && window.TABADivisions[key]) {
-      currentDivision = key;
-      divisionData    = window.TABADivisions[key];
-      renderRulebook();
-    } else if (key) {
-      renderLanding(`Unknown division "${key}". Please choose below.`);
-    } else {
-      renderLanding();
-    }
-  }
+    // Rules where TABA 11U differs from or adds to BC Minor
+    // Keys must match section `id` values in bc-minor-rules.js
+    overrides: {
 
-  // ─── Landing ──────────────────────────────────────────────
-  function renderLanding(errorMsg) {
-    const app = document.getElementById('app');
-    const cards = Object.entries(window.TABADivisions).map(([key, div]) => `
-      <a class="division-card" href="?division=${key}" style="--division-color:${div.color}">
-        <span class="dc-badge" style="background:${div.color}">${div.badge}</span>
-        <span class="dc-name">${div.name}</span>
-        <span class="dc-desc">${div.description || ''}</span>
-      </a>`).join('');
+      "22.07": {
+        type: "differs",
+        label: "11U Time Limits — All League Games",
+        bcMinorSummary: "The 2-hour no-new-inning rule applies to Provincial Championships only. No time limit is mandated for regular league play.",
+        tabaSummary: "TABA applies time limits to ALL regular league games — not just Provincials.",
+        content: `
+          <ul class="rl">
+            <li>Game length is <strong>two (2) hours</strong> from the scheduled start time.</li>
+            <li>No new inning shall start later than <strong>1 hour 45 minutes</strong> after the actual game start time.</li>
+            <li>If the home team is at bat when the 2-hour mark passes, the inning should be completed if possible (Umpire's decision).</li>
+            <li>In the event of weather or darkness, <strong>four innings</strong> constitute a complete game.</li>
+          </ul>`
+      },
 
-    app.innerHTML = `
-      <div class="landing">
-        <div class="landing-logo">⚾</div>
-        <h1>TABA Rulebook 2026</h1>
-        <p class="landing-sub">Tsawwassen Baseball Association</p>
-        ${errorMsg ? `<p style="color:#ff8080;font-size:.85rem;margin-bottom:1.5rem;">${errorMsg}</p>` : ''}
-        <div class="division-grid">${cards}</div>
-        <p class="landing-footer">BC Minor Baseball Association · bcminorbaseball.org<br>Providing Canadian Youth Baseball Programs Since 1963</p>
-      </div>`;
-    document.title = 'TABA Rulebook 2026';
-  }
+      "26.08": {
+        type: "differs",
+        label: "11U Run Limits — Early Innings Capped at 2",
+        bcMinorSummary: "10U & 11U summer: 4 runs per inning for all innings, with the last at-bat being unlimited.",
+        tabaSummary: "TABA caps innings 1–2 at 2 runs. Innings 3–5 follow the BC Minor 4-run cap. Inning 6 is open.",
+        content: `
+          <table>
+            <thead><tr><th>Innings</th><th>Run Limit (TABA 11U)</th><th>Out Limit</th></tr></thead>
+            <tbody>
+              <tr><td class="hi">1–2</td><td>2 runs maximum <span class="sb-badge badge-taba">TABA only</span></td><td>3 outs</td></tr>
+              <tr><td class="hi">3–5</td><td>4 runs maximum</td><td>3 outs</td></tr>
+              <tr><td class="hi">6 (or last)</td><td>Open — no run limit</td><td>3 outs only</td></tr>
+            </tbody>
+          </table>
+          <p class="note">The last inning is declared open by the umpire. The mercy rule may still end any half-inning.</p>`
+      },
 
-  // ─── Rulebook ─────────────────────────────────────────────
-  function renderRulebook() {
-    document.body.classList.add('rulebook-mode');
-    document.documentElement.style.setProperty('--division-color', divisionData.color);
+      "25.01": {
+        type: "differs",
+        label: "11U Fair Play — Infield/Outfield Position Limits",
+        bcMinorSummary: "No player may sit out 2 consecutive innings. General minimum participation — no specific infield/outfield inning counts.",
+        tabaSummary: "TABA specifies detailed position rotation: max 4 innings infield (only 1 position twice), pitcher & catcher max 3 innings each (only 2 count toward infield), max 3 innings outfield.",
+        content: `
+          <ul class="rl">
+            <li>Players may play a maximum of <strong>four (4) innings infield</strong>, of which only <strong>one position may be played twice</strong>.</li>
+            <li><strong>Pitcher and catcher</strong> may each occupy their position for a maximum of <strong>three (3) innings</strong>. Only two (2) of those innings count toward infield time.</li>
+            <li>Players may play a maximum of <strong>three (3) innings per game in the outfield</strong>. All outfield positions are considered the same position.</li>
+          </ul>
+          <div class="callout navy">
+            <p><strong>Example:</strong> If Bob plays 3 innings at catcher, only 2 count toward his infield total — so he can still play 1 inning at 1st base and 1 inning at 3rd base.</p>
+          </div>`
+      },
 
-    const overrideMap  = divisionData.overrides || {};
-    const allAdditions = divisionData.additions || [];
-    const additionsMap = buildAdditionsMap(allAdditions);
+      "26.03": {
+        type: "differs",
+        label: "11U Headfirst Slides — Stealing Home Restriction Added",
+        bcMinorSummary: "No intentional headfirst slides at 11U. No specific restriction on stealing home in any inning.",
+        tabaSummary: "TABA adds: no stealing of home in innings 1 or 2. The only ways to score in those innings are a walk or a play beginning with a hit ball.",
+        content: `
+          <ul class="rl">
+            <li>No intentional headfirst slides to any base or home plate — automatic out. (Matches BC Minor.)</li>
+            <li><strong>No stealing of home in innings 1 or 2.</strong> The only ways to score in those innings: being forced home by a walk, or the continuation of a play beginning with a hit ball.</li>
+            <li>Diving headfirst back to a base already legally acquired is permitted.</li>
+          </ul>`
+      },
 
-    buildSearchIndex(overrideMap, allAdditions);
-
-    const sidebarHTML = buildSidebar(overrideMap, allAdditions);
-    const mainHTML    = buildMain(overrideMap, additionsMap, allAdditions);
-
-    const app = document.getElementById('app');
-    const sidebarEl = document.createElement('div');
-    sidebarEl.id = 'sidebar';
-    sidebarEl.innerHTML = sidebarHTML;
-    const mainEl = document.createElement('main');
-    mainEl.id = 'main';
-    mainEl.innerHTML = mainHTML;
-    app.replaceWith(sidebarEl, mainEl);
-
-    document.title = `${divisionData.badge} Rulebook 2026 — TABA`;
-    attachBehaviours();
-  }
-
-  function buildAdditionsMap(allAdditions) {
-    const map = {};
-    allAdditions.forEach(a => {
-      if (!map[a.insertAfterRule]) map[a.insertAfterRule] = [];
-      map[a.insertAfterRule].push(a);
-    });
-    return map;
-  }
-
-  // ─── Search index ─────────────────────────────────────────
-  function buildSearchIndex(overrideMap, allAdditions) {
-    searchIndex = [];
-    const strip = html => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-
-    // TABA additions
-    allAdditions.forEach(a => {
-      searchIndex.push({
-        type:    'taba',
-        id:      a.id,
-        label:   `${divisionData.badge}`,
-        title:   a.title,
-        ruleId:  null,
-        text:    (a.title + ' ' + strip(a.content || '')).toLowerCase()
-      });
-    });
-
-    // BC Minor rules and sections
-    window.BCMinorRules.forEach(rule => {
-      searchIndex.push({
-        type:    'rule',
-        id:      `rule-${rule.id}`,
-        label:   `Rule ${rule.id}`,
-        title:   rule.title,
-        ruleId:  rule.id,
-        text:    (`rule ${rule.id} ${rule.title}`).toLowerCase()
-      });
-
-      (rule.sections || []).forEach(s => {
-        const hasOverride = !!overrideMap[s.id];
-        searchIndex.push({
-          type:     hasOverride ? 'differs' : 'section',
-          id:       s.id.replace('.', '-'),
-          label:    s.id,
-          title:    s.title,
-          ruleId:   rule.id,
-          text:     (s.id + ' ' + s.title + ' ' + strip(s.content || '')).toLowerCase(),
-          differs:  hasOverride
-        });
-      });
-    });
-  }
-
-  // ─── Sidebar ──────────────────────────────────────────────
-  function buildSidebar(overrideMap, allAdditions) {
-    const tabaLinks = allAdditions.map(a =>
-      `<a href="#${a.id}" class="taba-nav-link">✦ ${a.title}</a>`
-    ).join('');
-
-    const ruleLinks = window.BCMinorRules.map(rule => {
-      const hasOverride = rule.sections && rule.sections.some(s => overrideMap[s.id]);
-      const subLinks = (rule.sections || []).map(s => {
-        const so = overrideMap[s.id];
-        return `<a href="#${s.id.replace('.','-')}" class="${so ? 'has-override' : ''}">${s.id} ${s.title}</a>`;
-      }).join('');
-
-      if (subLinks) {
-        return `
-          <div class="nav-item ${hasOverride ? 'has-override' : ''}" data-nav-rule="${rule.id}">
-            <button class="nav-trigger">
-              <span>Rule ${rule.id}: ${rule.title}</span>
-              ${hasOverride ? `<span class="override-dot"></span>` : ''}
-              <span class="chev">▶</span>
-            </button>
-            <div class="nav-sub">${subLinks}</div>
-          </div>`;
+      "26.14": {
+        type: "adds",
+        label: "11U Intentional Walks — Prohibited",
+        content: `
+          <div class="callout red">
+            <p><strong>No intentional walks permitted in the 11U Division.</strong> Consistent with BC Minor Rule 26.14.</p>
+          </div>`
       }
-      return `
-        <div class="nav-plain">
-          <a href="#rule-${rule.id}" class="${hasOverride ? 'has-override' : ''}">Rule ${rule.id}: ${rule.title}</a>
-        </div>`;
-    }).join('');
+    },
 
-    return `
-      <div class="sb-brand">
-        <span class="sb-logo">⚾</span>
-        <h1>TABA Rulebook 2026</h1>
-        <a class="sb-division-badge" href="." title="Change division">${divisionData.badge} ›</a>
-      </div>
-
-      <div class="search-wrap">
-        <div class="search-box">
-          <span class="search-icon">⌕</span>
-          <input type="text" id="rule-search" placeholder="Search rules…" autocomplete="off"
-                 oninput="Rulebook.handleSearch(this.value)"
-                 onkeydown="Rulebook.searchKeydown(event)">
-          <button class="search-clear" id="search-clear" onclick="Rulebook.clearSearch()" title="Clear">✕</button>
-        </div>
-        <div id="search-results" class="search-results" style="display:none"></div>
-      </div>
-
-      <nav id="main-nav">
-        <div class="nav-group-label taba-group-label">${divisionData.badge} — Local Rules</div>
-        <div class="taba-nav-group">${tabaLinks}</div>
-        <div class="nav-group-label" style="margin-top:.6rem;">BC Minor Baseball — Rules 1–35</div>
-        ${ruleLinks}
-      </nav>`;
-  }
-
-  // ─── Main content ─────────────────────────────────────────
-  function buildMain(overrideMap, additionsMap, allAdditions) {
-    const cover = `
-      <div class="cover">
-        <div class="cover-eyebrow">Tsawwassen Baseball Association · 2026 Season</div>
-        <h1>BC Minor Baseball<br>Playing Rules</h1>
-        <p class="cover-sub">With ${divisionData.name} local rule overlays</p>
-        <div class="cover-pills">
-          <span class="cover-pill division">${divisionData.badge}</span>
-          <span class="cover-pill">bcminorbaseball.org</span>
-          <span class="cover-pill">Rules Co-Chairs: Ryan Hall · Erik Hope</span>
-        </div>
-      </div>`;
-
-    const legend = `
-      <div class="callout" style="margin-bottom:1.5rem;">
-        <p><strong>How to read this rulebook:</strong></p>
-        <ul class="rl">
-          <li><strong>Part 1</strong> — all <span style="display:inline-block;background:var(--division-color);color:#fff;font-family:'DM Mono',monospace;font-size:.6rem;padding:.08rem .4rem;border-radius:3px;vertical-align:middle;">${divisionData.badge}</span> local rules specific to TABA.</li>
-          <li><strong>Part 2</strong> — complete BC Minor rules 1–35. Sub-rules with a <span style="background:#fffbf0;border-left:3px solid var(--division-color);display:inline-block;padding:.05rem .35rem;font-size:.85em;">amber highlight</span> have a TABA local rule that differs.</li>
-        </ul>
-      </div>`;
-
-    const tabaSection = allAdditions.map(a => buildAddition(a)).join('');
-
-    const ruleBlocks = window.BCMinorRules.map(rule => {
-      const sectionHtml  = (rule.sections || []).map(s => buildSection(s, overrideMap[s.id])).join('');
-      const hasOverride  = (rule.sections || []).some(s => overrideMap[s.id]);
-      return `
-        <div class="rule-section ${hasOverride ? 'has-override' : ''}" id="rule-${rule.id}">
-          <button class="rule-toggle" onclick="Rulebook.toggleRule(this)">
-            <span class="rule-num">Rule ${rule.id}</span>
-            <span class="rule-title">${rule.title}</span>
-            ${hasOverride ? `<span class="rule-override-flag">${divisionData.badge} differs</span>` : ''}
-            <span class="rule-chev">▶</span>
-          </button>
-          <div class="rule-body">${sectionHtml}</div>
-        </div>`;
-    }).join('');
-
-    const footer = `
-      <div class="attr-bar">
-        <span class="attr-lock">🔒 Internal — TABA Use Only</span>
-        <p style="margin-top:.4rem;">
-          <strong>BC Minor Baseball Association playing rules reproduced for internal reference.</strong>
-          Authoritative source: <a href="http://www.bcminorbaseball.org">bcminorbaseball.org</a>.
-          ${divisionData.badge} local rules are TABA additions and do not supersede BC Minor rules except where explicitly stated.
-        </p>
-      </div>
-      <footer>
-        <p>Tsawwassen Baseball Association · <a href="https://www.tsawwassenbaseball.ca">tsawwassenbaseball.ca</a></p>
-        <p style="margin-top:.25rem;">BC Minor Baseball Association · <a href="http://www.bcminorbaseball.org">bcminorbaseball.org</a> · Providing Canadian Youth Baseball Programs Since 1963</p>
-      </footer>`;
-
-    return (
-      cover + legend +
-      `<div class="part-divider" id="taba-rules-section">
-        <span class="part-badge" style="background:var(--division-color)">PART 1</span>
-        <h2>${divisionData.badge} — Local Rules</h2>
-       </div>` +
-      tabaSection +
-      `<div class="part-divider" id="bcminor-rules-section">
-        <span class="part-badge">PART 2</span>
-        <h2>BC Minor Baseball — Rules 1–35</h2>
-       </div>` +
-      ruleBlocks + footer
-    );
-  }
-
-  function buildSection(section, override) {
-    const anchorId     = section.id.replace('.', '-');
-    const overridePanel = override ? buildOverridePanel(override, section.id) : '';
-    return `
-      <div class="sub-rule ${override ? 'has-override' : ''}" id="${anchorId}">
-        <div class="sub-rule-title">
-          ${section.id} ${section.title}
-          ${override ? `<span class="sub-rule-override-tag">⚡ ${divisionData.badge} differs</span>` : ''}
-        </div>
-        <div class="sub-rule-content">${section.content || ''}</div>
-        ${overridePanel}
-      </div>`;
-  }
-
-  function buildOverridePanel(override, ruleId) {
-    const type  = override.type || 'differs';
-    const icon  = type === 'differs' ? '⚡' : type === 'adds' ? '✦' : '✕';
-    const label = override.label || `${divisionData.badge} — ${type}`;
-    let body = '';
-    if (type === 'differs') {
-      body = `
-        <div class="diff-grid">
-          <div class="diff-col">
-            <div class="diff-col-label">⚾ BC Minor says (Rule ${ruleId})</div>
-            <p>${override.bcMinorSummary || ''}</p>
+    // Rules that TABA adds that have no BC Minor equivalent
+    // insertAfterRule: BC Minor rule `id` after which this appears
+    additions: [
+      {
+        id: "taba-11u-first-year-pitcher",
+        insertAfterRule: "24",
+        title: "First-Year Pitcher Rule",
+        badge: "TABA 11U Only",
+        content: `
+          <div class="callout blue">
+            <p>The <strong>first two innings of each game must be pitched by a first-year player</strong> — defined as a player who did not play in the 11U (Mosquito) Division in a previous year, and who is eligible to play one more year in 11U.</p>
           </div>
-          <div class="diff-col">
-            <div class="diff-col-label">✦ ${divisionData.badge} local rule</div>
-            ${override.content || `<p>${override.tabaSummary || ''}</p>`}
+          <p>A second-year player may not pitch until inning three or later, regardless of whether the first-year pitcher has reached their pitch limit.</p>
+          <p class="note">This rule has no equivalent in BC Minor Baseball rules. It is a TABA-specific development rule designed to give first-year players pitching experience.</p>`
+      },
+      {
+        id: "taba-11u-stealing-home",
+        insertAfterRule: "26",
+        title: "11U Base Running — Stealing Home Restriction",
+        badge: "TABA 11U Only",
+        content: `
+          <div class="callout red">
+            <p><strong>No stealing of home is allowed in the first two (2) innings.</strong></p>
           </div>
-        </div>`;
-    } else if (type === 'adds') {
-      body = `<div class="panel-adds">${override.content || ''}</div>`;
-    } else {
-      body = `<div class="panel-removes">${override.content || ''}</div>`;
-    }
-    return `
-      <div class="division-panel dp-open" style="--division-color:${divisionData.color}">
-        <div class="division-panel-header" onclick="Rulebook.togglePanel(this)">
-          <span class="dp-label">${icon} ${label}</span>
-          <span class="dp-chev">▼</span>
-        </div>
-        <div class="division-panel-body">${body}</div>
-      </div>`;
-  }
-
-  function buildAddition(addition) {
-    return `
-      <div class="taba-rule-section r-open" id="${addition.id}" style="--division-color:${divisionData.color}">
-        <button class="taba-rule-toggle" onclick="Rulebook.toggleRule(this, true)">
-          <span class="taba-rule-num">${addition.badge || divisionData.badge}</span>
-          <span class="taba-rule-title">${addition.title}</span>
-          <span class="taba-rule-chev">▼</span>
-        </button>
-        <div class="taba-rule-body">${addition.content || ''}</div>
-      </div>`;
-  }
-
-  // ─── TOC Navigation — expand then scroll ──────────────────
-  function goTo(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    // If inside a collapsed BC Minor rule body, open it first
-    const ruleBody = el.closest('.rule-body');
-    if (ruleBody) {
-      const section = ruleBody.closest('.rule-section');
-      if (section && !section.classList.contains('r-open')) {
-        section.classList.add('r-open');
-        const chev = section.querySelector('.rule-chev');
-        if (chev) chev.textContent = '▼';
+          <p>The only two ways a player can score in innings 1 and 2:</p>
+          <ul class="rl">
+            <li>Being forced home by a walk, hit batter, or catcher interference.</li>
+            <li>The continuation of a play that began with a hit ball.</li>
+          </ul>
+          <p>From inning 3 onward, stealing home is permitted subject to all other base running rules.</p>`
+      },
+      {
+        id: "taba-11u-game-length",
+        insertAfterRule: "22",
+        title: "11U Game Length & Time Limits",
+        badge: "TABA 11U Only",
+        content: `
+          <ul class="rl">
+            <li>Game length is <strong>two (2) hours</strong> from the scheduled start time.</li>
+            <li>No new inning shall start later than <strong>1 hour 45 minutes</strong> after the actual game start time.</li>
+            <li>If another game is scheduled afterward, or if the umpire deems it too dark to play safely, the game may be called (Umpire's decision) — score reverts to the last completed inning.</li>
+            <li>If the home team is at bat when the 2-hour mark passes, the inning should be completed if possible (Umpire's decision).</li>
+            <li>In the event of weather or darkness, <strong>four innings</strong> constitute a complete game.</li>
+          </ul>`
+      },
+      {
+        id: "taba-11u-coaches",
+        insertAfterRule: "10",
+        title: "11U Coaches — On-Field Rules",
+        badge: "TABA 11U Only",
+        content: `
+          <ul class="rl">
+            <li>Maximum <strong>three (3) coaches</strong> inside the fenced perimeter during game play. Coaches must remain in the dugout area unless their team is on offence and they occupy a coaches' box.</li>
+            <li>Only individuals who have completed a Criminal Record Check and are registered as a helper are permitted to work with players on the field.</li>
+            <li>The head coach meets with the opposing coach and umpires at home plate <strong>5 minutes prior</strong> to game time. Coaches introduce themselves by first name and present the team line-up (2 copies) to the home plate umpire. Home team presents first.</li>
+            <li><strong>No protests of any kind</strong> are allowed during TABA league play. If you have an issue, notify the 11U Division Manager. (Note: BC Minor Rule 28.01 still permits protests for illegal/ineligible players at Provincials.)</li>
+          </ul>`
+      },
+      {
+        id: "taba-11u-scheduling",
+        insertAfterRule: "20",
+        title: "11U Game Scheduling",
+        badge: "TABA 11U Only",
+        content: `
+          <ul class="rl">
+            <li>Games may not be postponed or rescheduled without the agreement of the 11U Division Manager and both head coaches.</li>
+            <li>Teams shall not consider a game canceled due to bad weather unless officially notified.</li>
+            <li>Minimum cancellation notification time: <strong>1¾ hours before game start</strong>.</li>
+          </ul>`
+      },
+      {
+        id: "taba-11u-home-team",
+        insertAfterRule: "20",
+        title: "11U Home Team Responsibilities",
+        badge: "TABA 11U Only",
+        content: `
+          <ul class="rl">
+            <li>Notify the umpire allocator, concession manager, and 11U Division Manager of any game cancellations, postponements, or rescheduling.</li>
+            <li>Prepare the diamond: line the field and fill depressions before the game. After the game, return all equipment to bins and lock up. No children allowed in the equipment room or bins.</li>
+            <li>Bring <strong>two provided game balls</strong> to the umpire at the start of each game.</li>
+          </ul>`
+      },
+      {
+        id: "taba-11u-9u-callup",
+        insertAfterRule: "5",
+        title: "11U — Use of 9U (Tadpole) Players",
+        badge: "TABA 11U Only",
+        content: `
+          <div class="callout red">
+            <p>BC Minor (Rule 5.06) limits 9U call-ups to <strong>5 regular season games plus one tournament</strong> per player per season. Stiff penalties apply for violations.</p>
+          </div>
+          <ul class="rl">
+            <li>Second-year Tadpole (9U) players are eligible to play if a team is short, provided it does not conflict with their own Tadpole scheduled game.</li>
+            <li>Teams are encouraged to call up second-year Tadpoles when they have 9 or fewer players available.</li>
+            <li>Coaches must request permission from both the Tadpole player's coach and the 9U Division Manager before asking a Tadpole player to play. Requests may be denied if games conflict, or if the player is injured or suspended.</li>
+            <li>Tadpole players must wear their regular team uniform when playing 11U games.</li>
+            <li>Tadpole players are <strong>not allowed to pitch</strong> in 11U games.</li>
+          </ul>`
       }
-    }
+    ]
+  },
 
-    // If inside a collapsed TABA section, open it
-    const tabaBody = el.closest('.taba-rule-body');
-    if (tabaBody) {
-      const section = tabaBody.closest('.taba-rule-section');
-      if (section && !section.classList.contains('r-open')) {
-        section.classList.add('r-open');
-      }
-    }
+  /* ═══════════════════════════════════════════════════════════
+     ADD NEW DIVISIONS BELOW THIS LINE
+     Copy the "11u" block above as your template.
+     ═══════════════════════════════════════════════════════════
 
-    // Wait a frame for display:none → block to take effect, then scroll
-    requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+  "9u": {
+    name: "9U — Tadpole",
+    badge: "9U Tadpole",
+    color: "#27ae60",
+    description: "Spring & Summer 2026",
+    overrides: {
+      // "rule.id": { type, label, bcMinorSummary, tabaSummary, content }
+    },
+    additions: [
+      // { id, insertAfterRule, title, badge, content }
+    ]
+  },
 
-    // Highlight active nav link
-    document.querySelectorAll('nav a').forEach(a => a.classList.remove('nav-active'));
-    const activeLink = document.querySelector(`nav a[href="#${id}"]`);
-    if (activeLink) activeLink.classList.add('nav-active');
+  "13u": {
+    name: "13U — Peewee",
+    badge: "13U Peewee",
+    color: "#8e44ad",
+    description: "Spring & Summer 2026",
+    overrides: {},
+    additions: []
+  },
+
+  "18u": {
+    name: "18U — Midget",
+    badge: "18U Midget",
+    color: "#8B0000",
+    description: "Spring & Summer 2026",
+    overrides: {},
+    additions: []
   }
 
-  // ─── Search ───────────────────────────────────────────────
-  let searchTimeout = null;
-  let selectedResult = -1;
+  */
 
-  function handleSearch(query) {
-    const q = query.trim().toLowerCase();
-    const clearBtn = document.getElementById('search-clear');
-    const resultsEl = document.getElementById('search-results');
-    const nav = document.getElementById('main-nav');
-
-    if (clearBtn) clearBtn.style.display = q ? 'flex' : 'none';
-
-    if (!q) {
-      resultsEl.style.display = 'none';
-      nav.style.display = 'block';
-      selectedResult = -1;
-      return;
-    }
-
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-      const words = q.split(/\s+/).filter(Boolean);
-
-      // Score each index entry
-      const scored = searchIndex
-        .map(entry => {
-          let score = 0;
-          words.forEach(w => {
-            if (entry.title.toLowerCase().includes(w)) score += 10;
-            if (entry.label.toLowerCase().includes(w)) score += 5;
-            if (entry.text.includes(w)) score += 1;
-          });
-          return { ...entry, score };
-        })
-        .filter(e => e.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 25);
-
-      nav.style.display = 'none';
-      selectedResult = -1;
-
-      if (scored.length === 0) {
-        resultsEl.style.display = 'block';
-        resultsEl.innerHTML = `<div class="search-empty">No results for "<strong>${escHtml(query)}</strong>"</div>`;
-        return;
-      }
-
-      const highlight = str => {
-        let out = escHtml(str);
-        words.forEach(w => {
-          const re = new RegExp(`(${w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
-          out = out.replace(re, '<mark>$1</mark>');
-        });
-        return out;
-      };
-
-      const items = scored.map((e, i) => {
-        const typeLabel = e.type === 'taba'
-          ? `<span class="sr-type sr-type-taba">${divisionData.badge}</span>`
-          : e.type === 'differs'
-          ? `<span class="sr-type sr-type-differs">Differs</span>`
-          : e.type === 'rule'
-          ? `<span class="sr-type sr-type-rule">Rule ${e.ruleId}</span>`
-          : `<span class="sr-type sr-type-section">${e.label}</span>`;
-
-        return `
-          <div class="search-result" data-id="${e.id}" data-idx="${i}"
-               onclick="Rulebook.goTo('${e.id}'); Rulebook.clearSearch();">
-            ${typeLabel}
-            <span class="sr-title">${highlight(e.title)}</span>
-          </div>`;
-      }).join('');
-
-      resultsEl.style.display = 'block';
-      resultsEl.innerHTML = `
-        <div class="search-count">${scored.length} result${scored.length !== 1 ? 's' : ''}</div>
-        ${items}`;
-    }, 150);
-  }
-
-  function searchKeydown(e) {
-    const results = document.querySelectorAll('.search-result');
-    if (!results.length) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      selectedResult = Math.min(selectedResult + 1, results.length - 1);
-      updateSelectedResult(results);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      selectedResult = Math.max(selectedResult - 1, 0);
-      updateSelectedResult(results);
-    } else if (e.key === 'Enter' && selectedResult >= 0) {
-      e.preventDefault();
-      results[selectedResult].click();
-    } else if (e.key === 'Escape') {
-      clearSearch();
-    }
-  }
-
-  function updateSelectedResult(results) {
-    results.forEach((r, i) => r.classList.toggle('sr-selected', i === selectedResult));
-    if (selectedResult >= 0) results[selectedResult].scrollIntoView({ block: 'nearest' });
-  }
-
-  function clearSearch() {
-    const input = document.getElementById('rule-search');
-    const resultsEl = document.getElementById('search-results');
-    const nav = document.getElementById('main-nav');
-    const clearBtn = document.getElementById('search-clear');
-    if (input) input.value = '';
-    if (resultsEl) { resultsEl.style.display = 'none'; resultsEl.innerHTML = ''; }
-    if (nav) nav.style.display = 'block';
-    if (clearBtn) clearBtn.style.display = 'none';
-    selectedResult = -1;
-  }
-
-  function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // ─── Behaviours ───────────────────────────────────────────
-  function attachBehaviours() {
-    // Sidebar accordion toggles
-    document.querySelectorAll('.nav-trigger').forEach(btn => {
-      btn.addEventListener('click', () => btn.parentElement.classList.toggle('n-open'));
-    });
-
-    // ALL nav anchor links — intercept and use goTo() so collapsed sections open first
-    document.querySelectorAll('nav a[href^="#"]').forEach(a => {
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        goTo(a.getAttribute('href').slice(1));
-      });
-    });
-
-    // Scroll spy — highlight active nav link
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        const id = e.target.id;
-        document.querySelectorAll('nav a').forEach(a => {
-          a.classList.toggle('nav-active', a.getAttribute('href') === '#' + id);
-        });
-        const parentGroup = document.querySelector(`[data-nav-rule="${id.replace('rule-','')}"]`);
-        if (parentGroup) parentGroup.classList.add('n-open');
-      });
-    }, { rootMargin: '-5% 0px -80% 0px' });
-
-    document.querySelectorAll('[id]').forEach(el => obs.observe(el));
-  }
-
-  // ─── Toggle helpers ───────────────────────────────────────
-  function toggleRule(btn) {
-    const section = btn.parentElement;
-    section.classList.toggle('r-open');
-    const chev = btn.querySelector('.rule-chev, .taba-rule-chev');
-    if (chev) chev.textContent = section.classList.contains('r-open') ? '▼' : '▶';
-  }
-
-  function togglePanel(header) {
-    const panel = header.parentElement;
-    panel.classList.toggle('dp-open');
-    const chev = header.querySelector('.dp-chev');
-    if (chev) chev.textContent = panel.classList.contains('dp-open') ? '▼' : '▶';
-  }
-
-  return { init, goTo, toggleRule, togglePanel, handleSearch, searchKeydown, clearSearch };
-
-})();
+};
