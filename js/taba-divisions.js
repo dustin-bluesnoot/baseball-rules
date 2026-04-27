@@ -21,7 +21,7 @@ window.TABADivisions = {
   "11u": {
     name: "11U — Mosquito",
     badge: "11U Mosquito",
-    color: "#163462",
+    color: "#0c413b",
     description: "Spring & Summer 2026",
 
     // Rules where TABA 11U differs from or adds to BC Minor
@@ -237,4 +237,5 @@ window.TABADivisions = {
   }
 
   */
+
 };
