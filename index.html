@@ -10,43 +10,56 @@
 </head>
 <body>
 
-  <!--
-    Pre-built DOM structure.
-    In landing mode:  only #app is shown.
-    In rulebook mode: #app is hidden, #sidebar + #main are shown.
-    The renderer never needs to create or move elements — it just sets innerHTML.
-  -->
-
-  <!-- Landing / loading screen -->
   <div id="app">
     <div id="loading">
       <span class="load-icon">⚾</span>
-      <p>Loading rulebook…</p>
+      <p id="load-status">Loading rulebook…</p>
     </div>
   </div>
 
-  <!-- Rulebook shell — hidden until renderer fills it in -->
   <div id="sidebar" style="display:none"></div>
   <main id="main" style="display:none"></main>
 
-  <!-- Data files must load before renderer -->
-  <script src="js/bc-minor-rules.js"></script>
-  <script src="js/taba-divisions.js"></script>
-  <script src="js/renderer.js"></script>
+  <script>
+    // Show any load failure visibly on screen
+    function showError(msg) {
+      document.getElementById('load-status').innerHTML =
+        '<span style="color:#c0392b;font-weight:bold">Error: ' + msg + '</span>';
+      console.error('Rulebook error:', msg);
+    }
+    window._loaded = { rules: false, divisions: false, renderer: false };
+  </script>
+
+  <script src="js/bc-minor-rules.js"
+    onload="window._loaded.rules = true; document.getElementById('load-status').textContent = 'Loaded rules…'"
+    onerror="showError('Failed to load bc-minor-rules.js — check file path')">
+  </script>
+
+  <script src="js/taba-divisions.js"
+    onload="window._loaded.divisions = true; document.getElementById('load-status').textContent = 'Loaded divisions…'"
+    onerror="showError('Failed to load taba-divisions.js — check file path')">
+  </script>
+
+  <script src="js/renderer.js"
+    onload="window._loaded.renderer = true; document.getElementById('load-status').textContent = 'Starting…'"
+    onerror="showError('Failed to load renderer.js — check file path')">
+  </script>
 
   <script>
     try {
-      var params   = new URLSearchParams(window.location.search);
-      var division = params.get('division');
-      window.Rulebook.init(division);
+      if (!window._loaded.rules)    { showError('bc-minor-rules.js did not load'); }
+      else if (!window._loaded.divisions) { showError('taba-divisions.js did not load'); }
+      else if (!window._loaded.renderer)  { showError('renderer.js did not load'); }
+      else if (!window.BCMinorRules)      { showError('BCMinorRules is not defined — bc-minor-rules.js may have a syntax error'); }
+      else if (!window.TABADivisions)     { showError('TABADivisions is not defined — taba-divisions.js may have a syntax error'); }
+      else if (!window.Rulebook)          { showError('Rulebook is not defined — renderer.js may have a syntax error'); }
+      else {
+        var params   = new URLSearchParams(window.location.search);
+        var division = params.get('division');
+        window.Rulebook.init(division);
+      }
     } catch(err) {
-      // Show the error visibly so we're never just stuck on the spinner
-      document.getElementById('loading').innerHTML =
-        '<span style="font-size:2rem">⚠️</span>' +
-        '<p style="color:#c0392b;font-weight:bold;margin-top:.5rem">Failed to load rulebook</p>' +
-        '<p style="font-size:.8rem;color:#666;max-width:400px;margin-top:.5rem">' + err.message + '</p>' +
-        '<pre style="font-size:.65rem;color:#999;max-width:500px;white-space:pre-wrap;margin-top:.5rem">' + err.stack + '</pre>';
-      console.error('Rulebook init failed:', err);
+      showError(err.message + '<br><small style="color:#999">' + (err.stack || '').replace(/\n/g,'<br>') + '</small>');
     }
   </script>
 
