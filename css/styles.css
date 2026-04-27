@@ -7,8 +7,8 @@
   --navy:       #0d2240;
   --navy-mid:   #163462;
   --red:        #c0392b;
-  --gold:       #d4a017;
-  --gold-light: #f0c040;
+  --gold:       #f0b427;
+  --gold-light: #f5c84a;
   --cream:      #fdf9f2;
   --parch:      #f5efe0;
   --rule-bg:    #fff8ee;
@@ -375,7 +375,7 @@ nav a.nav-active { color: var(--gold-light) !important; font-weight: 600; }
 /* Sub-rules with a TABA override get a prominent amber highlight */
 .sub-rule.has-override {
   border-left: 4px solid var(--division-color);
-  background: #fffbf0;
+  background: #f0f7f5;
   border-radius: 0 4px 4px 0;
   padding: .65rem .9rem .65rem .9rem;
   margin-left: -.1rem;
