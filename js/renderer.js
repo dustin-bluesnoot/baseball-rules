@@ -34,12 +34,39 @@ window.Rulebook = (() => {
     if (mainEl)  mainEl.style.display  = 'none';
     app.style.display = '';
 
-    const cards = Object.entries(window.TABADivisions).map(([key, div]) => `
-      <a class="division-card" href="?division=${key}" style="--division-color:${div.color}">
-        <span class="dc-badge" style="background:${div.color}">${div.badge}</span>
-        <span class="dc-name">${div.name}</span>
-        <span class="dc-desc">${div.description || ''}</span>
-      </a>`).join('');
+    const divisions = window.TABADivisions;
+
+    // Group divisions by their `group` property
+    const groups = {};
+    Object.entries(divisions).forEach(([key, div]) => {
+      const g = div.group || 'other';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push([key, div]);
+    });
+
+    const groupLabels = {
+      taba:      'TABA Local Leagues',
+      interlock: 'Fraser Delta Interlock',
+      other:     'Other Divisions'
+    };
+
+    const groupOrder = ['taba', 'interlock', 'other'];
+
+    const groupHTML = groupOrder
+      .filter(g => groups[g] && groups[g].length > 0)
+      .map(g => {
+        const cards = groups[g].map(([key, div]) => `
+          <a class="division-card" href="?division=${key}" style="--division-color:${div.color}">
+            <span class="dc-badge" style="background:${div.color}">${div.badge}</span>
+            <span class="dc-name">${div.name}</span>
+            <span class="dc-desc">${div.description || ''}</span>
+          </a>`).join('');
+        return `
+          <div class="landing-group">
+            <h3 class="landing-group-label">${groupLabels[g] || g}</h3>
+            <div class="division-grid">${cards}</div>
+          </div>`;
+      }).join('');
 
     app.innerHTML = `
       <div class="landing">
@@ -47,7 +74,7 @@ window.Rulebook = (() => {
         <h1>TABA Rulebook 2026</h1>
         <p class="landing-sub">Tsawwassen Baseball Association</p>
         ${errorMsg ? `<p style="color:#ff8080;font-size:.85rem;margin-bottom:1.5rem;">${errorMsg}</p>` : ''}
-        <div class="division-grid">${cards}</div>
+        ${groupHTML}
         <p class="landing-footer">BC Minor Baseball Association · bcminorbaseball.org<br>Providing Canadian Youth Baseball Programs Since 1963</p>
       </div>`;
     document.title = 'TABA Rulebook 2026';
@@ -488,6 +515,15 @@ window.Rulebook = (() => {
         e.preventDefault();
         goTo(a.getAttribute('href').slice(1));
       });
+    });
+
+    // BC Minor rule cross-links inside content (class="bcm-link")
+    // These are rendered inside innerHTML so we use event delegation on #main
+    document.getElementById('main').addEventListener('click', e => {
+      const link = e.target.closest('a.bcm-link[href^="#"]');
+      if (!link) return;
+      e.preventDefault();
+      goTo(link.getAttribute('href').slice(1));
     });
 
     // Scroll spy — highlight active nav link
