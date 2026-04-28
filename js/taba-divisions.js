@@ -24,6 +24,122 @@
 window.TABADivisions = {
 
   /* ═══════════════════════════════════════════════════════════
+     9U — Tadpole (TABA Local)
+     ═══════════════════════════════════════════════════════════ */
+  "9u": {
+    name: "9U — Tadpole",
+    badge: "9U Tadpole",
+    color: "#b05a00",
+    group: "taba",
+    description: "TABA Home/Host Rules · Spring & Summer 2026",
+
+    overrides: {
+
+      "31.03": {
+        type: "differs",
+        label: "9U General Rules — TABA Pitching Machine Format",
+        bcMinorSummary: "BC Minor 9U: live pitching (coach or player), max 1 inning / 35 pitches per pitcher; 4 complete innings (max 6); 2 hr 15 min time limit; 9 players on field; inning ends on 3 outs or 4 runs; 10-run mercy rule after 5 innings; score is kept.",
+        tabaSummary: "TABA 9U uses a coach-operated pitching machine. 5 innings, 1:30 time limit, 10 players (4 outfielders), inning ends on 3 outs or 6 batters, no run limit, no mercy rule, no score kept.",
+        content: `
+          <div class="callout blue">
+            <p><strong>TABA 9U uses a coach-operated pitching machine.</strong> This format replaces BC Minor's pitching and scoring provisions in Rule 31.03 entirely. Pitch count and pitcher eligibility rules do not apply in TABA 9U.</p>
+          </div>
+          <table>
+            <thead><tr><th>Item</th><th>BC Minor 9U (Rule 31.03)</th><th>TABA 9U <span class="sb-badge badge-taba">TABA Home/Host Rule</span></th></tr></thead>
+            <tbody>
+              <tr><td class="hi">Pitching</td><td>Live — 1 inning / 35 pitches per pitcher max</td><td>Coach-operated pitching machine</td></tr>
+              <tr><td class="hi">Innings</td><td>4 complete (max 6)</td><td>5 innings</td></tr>
+              <tr><td class="hi">Time limit</td><td>2 hours 15 minutes</td><td>1 hour 30 minutes</td></tr>
+              <tr><td class="hi">Players on field</td><td>9</td><td>10 (including 4 outfielders)</td></tr>
+              <tr><td class="hi">Inning ends when</td><td>3 outs <em>or</em> 4 runs scored</td><td>3 outs <em>or</em> 6 batters faced</td></tr>
+              <tr><td class="hi">Run limit</td><td>4 runs per inning</td><td>None</td></tr>
+              <tr><td class="hi">Score</td><td>Kept</td><td>Not kept</td></tr>
+              <tr><td class="hi">Mercy rule</td><td>10-run rule after 5 innings</td><td>None</td></tr>
+            </tbody>
+          </table>`
+      }
+    },
+
+    additions: [
+      {
+        id: "taba-9u-precedence",
+        insertAfterRule: "1",
+        title: "9U Rule Scope & Precedence",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <div class="callout blue">
+            <p><strong>These rules apply when TABA is the home association or tournament host.</strong> For away games, check the host association's published local rules first.</p>
+          </div>
+          <div class="callout navy">
+            <p><strong>Order of Precedence for 9U games (highest to lowest):</strong></p>
+            <ol class="nl">
+              <li><strong>Home/Host Association Local Rules</strong> — TABA rules apply at Tsawwassen fields or TABA-hosted tournaments. At away games, the host association's published local rules apply.</li>
+              <li><strong>Fraser Delta Interlock Rules</strong> — if the host association has no published local rule for the situation.</li>
+              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — if Interlock is silent.</li>
+              <li><strong>Official Rules of Baseball</strong> — if BC Minor is silent.</li>
+            </ol>
+          </div>`
+      },
+      {
+        id: "taba-9u-game-structure",
+        insertAfterRule: "22",
+        title: "9U Game Structure",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <ul class="rl">
+            <li>Games are <strong>5 innings</strong>.</li>
+            <li>No new inning shall start after <strong>1 hour and 30 minutes</strong> from the scheduled start time.</li>
+            <li>Each half-inning ends after <strong>3 outs</strong> or <strong>6 batters</strong> have come to the plate, whichever comes first.</li>
+          </ul>
+          <div class="callout red">
+            <p><strong>No score is kept.</strong> There is no run limit and no mercy rule in TABA 9U.</p>
+          </div>
+          <p class="note">Three innings constitute a complete game in the event of weather or darkness.</p>`
+      },
+      {
+        id: "taba-9u-field",
+        insertAfterRule: "18",
+        title: "9U Field Setup & Equipment",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <ul class="rl">
+            <li><strong>10 players</strong> take the field: the standard 6 infield positions plus <strong>4 outfielders</strong>.</li>
+            <li>A <strong>real baseball (45cc)</strong> is used — not a safety or reduced-impact ball.</li>
+          </ul>`
+      },
+      {
+        id: "taba-9u-pitching",
+        insertAfterRule: "24",
+        title: "9U Pitching Machine — Coach Operation",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <div class="callout blue">
+            <p>The <strong>pitching machine is operated by coaches</strong>. There is no live pitching in TABA 9U. BC Minor pitch count and pitcher eligibility rules (<a href="#rule-24" class="bcm-link">Rule 24</a>) do not apply.</p>
+          </div>
+          <ul class="rl">
+            <li>The goal is to <strong>maximize opportunities for players to hit</strong> and develop fundamental batting skills.</li>
+            <li>Coaches operating the machine should aim to deliver consistent, hittable pitches suitable for the age group.</li>
+          </ul>
+          <p class="note">Confirm with TABA regarding the specific batter protocol (e.g., maximum pitches per at-bat) before publishing as binding.</p>`
+      },
+      {
+        id: "taba-9u-baserunning",
+        insertAfterRule: "26",
+        title: "9U Base Running",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <div class="callout red">
+            <ul class="rl">
+              <li><strong>No advancing on overthrows.</strong> Runners may not advance on a ball thrown past a fielder or out of play.</li>
+              <li><strong>Runners stop advancing once the ball is returned to the infield.</strong> Once any infield fielder has control of the ball, all runners must stop at the nearest base.</li>
+            </ul>
+          </div>
+          <p class="note">These restrictions are designed to keep play safe and efficient at the developmental level.</p>`
+      }
+    ]
+  },
+
+  /* ═══════════════════════════════════════════════════════════
      11U — Mosquito (TABA Local)
      ═══════════════════════════════════════════════════════════ */
   "11u": {
