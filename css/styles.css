@@ -491,7 +491,10 @@ p:last-child { margin-bottom: 0; }
 .callout.red   { border-color: var(--red);  background: #fff4f4; }
 .callout.blue  { border-color: #2980b9;     background: #e8f4ff; }
 .callout.navy  { border-color: var(--navy); background: #f0f2f8; }
+.callout.green { border-color: #27ae60; background: #f0fff4; }
 .callout p { margin-bottom: .3rem; } .callout p:last-child { margin-bottom: 0; }
+
+.badge-interlock { background: #e8f4e8; color: #1a6b1a; border: 1px solid #90d090; }
 
 table { width: 100%; border-collapse: collapse; font-size: .84rem; margin: .6rem 0; }
 th {
