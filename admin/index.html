@@ -365,7 +365,11 @@ document.getElementById('login-form').addEventListener('submit', async e => {
     if (res.ok) {
       sessionStorage.setItem('adminToken', pw);
       enterApp();
+    } else if (res.status === 401) {
+      errEl.textContent = 'Incorrect password.';
+      errEl.hidden = false;
     } else {
+      errEl.textContent = `Server error (${res.status}) — check Vercel env vars and redeploy.`;
       errEl.hidden = false;
     }
   } catch {
