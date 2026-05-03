@@ -1,14 +1,7 @@
-const { Octokit } = require('@octokit/rest');
-
-const OWNER  = 'dustin-bluesnoot';
-const REPO   = 'baseball-rules';
-const PATH   = 'amendments.json';
-const BRANCH = 'main';
+const { kv } = require('@vercel/kv');
 
 module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).end('Method Not Allowed');
-  }
+  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
   const auth = req.headers['authorization'] || '';
   if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
@@ -20,46 +13,34 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  const amendments = await kv.get('amendments') || {};
+  const existing   = amendments?.[divisionKey]?.[sectionType]?.[sectionId];
 
-  let current = {};
-  let sha;
-  try {
-    const { data } = await octokit.rest.repos.getContent({
-      owner: OWNER, repo: REPO, path: PATH, ref: BRANCH,
+  if (existing) {
+    delete amendments[divisionKey][sectionType][sectionId];
+    if (Object.keys(amendments[divisionKey][sectionType]).length === 0) {
+      delete amendments[divisionKey][sectionType];
+    }
+    if (Object.keys(amendments[divisionKey] || {}).length === 0) {
+      delete amendments[divisionKey];
+    }
+    await kv.set('amendments', amendments);
+
+    const timestamp = new Date().toISOString();
+    const auditLog  = await kv.get('audit_log') || [];
+    auditLog.unshift({
+      id:            Date.now().toString(),
+      timestamp,
+      action:        'revert',
+      divisionKey,
+      sectionType,
+      sectionId,
+      changedFields: Object.keys(existing).filter(k => k !== '_meta'),
+      before:        existing,
+      after:         null,
     });
-    current = JSON.parse(Buffer.from(data.content, 'base64').toString('utf8'));
-    sha = data.sha;
-  } catch (err) {
-    if (err.status !== 404) throw err;
+    await kv.set('audit_log', auditLog.slice(0, 200));
   }
 
-  if (!sha) {
-    return res.status(200).json({ success: true, message: 'Nothing to revert' });
-  }
-
-  // Remove the specific section's amendments
-  if (current[divisionKey]?.[sectionType]?.[sectionId]) {
-    delete current[divisionKey][sectionType][sectionId];
-  }
-
-  // Prune empty parent objects
-  if (current[divisionKey]?.[sectionType] &&
-      Object.keys(current[divisionKey][sectionType]).length === 0) {
-    delete current[divisionKey][sectionType];
-  }
-  if (current[divisionKey] && Object.keys(current[divisionKey]).length === 0) {
-    delete current[divisionKey];
-  }
-
-  const message = `CMS: Revert ${divisionKey}/${sectionId} to original [admin]`;
-
-  await octokit.rest.repos.createOrUpdateFileContents({
-    owner: OWNER, repo: REPO, path: PATH, branch: BRANCH,
-    message,
-    content: Buffer.from(JSON.stringify(current, null, 2) + '\n').toString('base64'),
-    sha,
-  });
-
-  return res.status(200).json({ success: true, message });
+  return res.status(200).json({ success: true });
 };

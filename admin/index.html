@@ -244,12 +244,48 @@
 
     /* ── Amendment ref ──────────────────────────── */
     .amendment-ref {
-      font-size: .72rem; color: #888; padding: .5rem .7rem;
-      background: #f8f9fc; border-radius: 5px; margin-bottom: .9rem;
+      font-size: .72rem; color: #555; padding: .45rem .7rem;
+      background: #f0fff4; border-radius: 5px; margin-bottom: .9rem;
       border-left: 3px solid #2ecc71;
     }
-    .amendment-ref a { color: #1a5276; text-decoration: none; font-weight: 600; }
-    .amendment-ref a:hover { text-decoration: underline; }
+
+    /* ── Audit log ──────────────────────────────── */
+    .audit-header {
+      display: flex; align-items: center; gap: .55rem; flex-wrap: wrap;
+    }
+    .audit-action {
+      font-size: .62rem; font-weight: 700; padding: .1rem .38rem;
+      border-radius: 3px; letter-spacing: .04em; flex-shrink: 0;
+    }
+    .audit-action.update { background: #dceeff; color: #1a4a8a; }
+    .audit-action.revert { background: #ffe8e8; color: #8b0000; }
+    .audit-section { font-size: .82rem; font-weight: 600; flex: 1; min-width: 0; }
+    .audit-date { font-size: .72rem; color: #888; white-space: nowrap; }
+    .audit-diff { margin-top: .45rem; }
+    .audit-diff > summary {
+      font-size: .75rem; color: #555; cursor: pointer;
+      padding: .15rem 0; list-style: none; display: inline-block;
+    }
+    .audit-diff > summary::before { content: '▶ '; font-size: .5rem; }
+    .audit-diff[open] > summary::before { content: '▼ '; }
+    .diff-field { margin-top: .55rem; }
+    .diff-field-name {
+      font-family: 'Menlo', monospace; font-size: .68rem;
+      background: #f0f2f8; padding: .08rem .3rem; border-radius: 2px;
+      color: #444; font-weight: 600;
+    }
+    .diff-row { display: flex; gap: .45rem; margin-top: .25rem; align-items: flex-start; }
+    .diff-label {
+      font-size: .6rem; font-weight: 700; padding: .1rem .3rem;
+      border-radius: 2px; flex-shrink: 0; margin-top: .05rem; letter-spacing: .03em;
+    }
+    .diff-label.before { background: #ffe8e8; color: #8b0000; }
+    .diff-label.after  { background: #d4f5e2; color: #1a7a4a; }
+    .diff-text {
+      font-family: 'Menlo', monospace; font-size: .71rem; color: #333;
+      word-break: break-word; white-space: pre-wrap;
+      max-height: 120px; overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -288,7 +324,7 @@
     <div class="toolbar">
       <label for="div-select">Division</label>
       <select id="div-select"></select>
-      <span class="toolbar-note">Changes are committed to GitHub and deployed in ~60 s.</span>
+      <span class="toolbar-note">Changes go live immediately on the next page load.</span>
     </div>
     <div id="editor-content"></div>
   </div>
@@ -392,7 +428,7 @@ async function enterApp() {
    ════════════════════════════════════════════════════════════ */
 async function loadAmendments() {
   try {
-    const r = await fetch('../amendments.json?nc=' + Date.now());
+    const r = await fetch('/api/amendments?nc=' + Date.now());
     amendments = r.ok ? await r.json() : {};
   } catch {
     amendments = {};
@@ -456,9 +492,7 @@ function buildAdditionCard(divKey, addition) {
   const badge   = effectiveVal(divKey, type, sid, 'badge',   addition.badge   || '');
   const content = effectiveVal(divKey, type, sid, 'content', addition.content || '');
 
-  const metaBlock = meta ? `<div class="amendment-ref">
-    Last amended ${fmtDate(meta.updated)} · <a href="${escA(meta.url)}" target="_blank" rel="noopener">View change on GitHub ↗</a>
-  </div>` : '';
+  const metaBlock = meta ? `<div class="amendment-ref">Last amended ${fmtDate(meta.updated)}</div>` : '';
 
   return `
     <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
@@ -488,9 +522,7 @@ function buildOverrideCard(divKey, ruleId, ov) {
   const tabaSum    = effectiveVal(divKey, type, ruleId, 'tabaSummary',   ov.tabaSummary   || '');
   const content    = effectiveVal(divKey, type, ruleId, 'content',       ov.content       || '');
 
-  const metaBlock = meta ? `<div class="amendment-ref">
-    Last amended ${fmtDate(meta.updated)} · <a href="${escA(meta.url)}" target="_blank" rel="noopener">View change on GitHub ↗</a>
-  </div>` : '';
+  const metaBlock = meta ? `<div class="amendment-ref">Last amended ${fmtDate(meta.updated)}</div>` : '';
 
   return `
     <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
@@ -619,6 +651,7 @@ async function handleSave(btn, divKey) {
     if (!amendments[div][sectionType])             amendments[div][sectionType] = {};
     if (!amendments[div][sectionType][sectionId])  amendments[div][sectionType][sectionId] = {};
     Object.assign(amendments[div][sectionType][sectionId], changes);
+    amendments[div][sectionType][sectionId]._meta = { updated: new Date().toISOString(), author: 'admin' };
 
     // Mark card visually
     const details = document.getElementById(cid + '-details');
@@ -630,7 +663,7 @@ async function handleSave(btn, divKey) {
       }
     }
 
-    statusEl.textContent = '✓ Saved — site redeploys in ~60 s.';
+    statusEl.textContent = '✓ Saved — live on next page load.';
     statusEl.className = 'save-status ok';
   } catch (err) {
     statusEl.textContent = '✗ ' + err.message;
@@ -679,6 +712,11 @@ async function handleRevert(btn, divKey) {
 /* ════════════════════════════════════════════════════════════
    Audit log
    ════════════════════════════════════════════════════════════ */
+function truncate(str, max) {
+  const s = str == null ? '' : String(str);
+  return s.length > max ? s.slice(0, max) + '…' : s;
+}
+
 async function loadAuditLog() {
   const el = document.getElementById('audit-content');
   el.innerHTML = '<p class="empty-msg">Loading…</p>';
@@ -692,19 +730,38 @@ async function loadAuditLog() {
       return;
     }
 
-    el.innerHTML = entries.map(e => `
-      <div class="audit-entry">
-        <div class="audit-msg">${escH(e.message)}</div>
-        <div class="audit-meta">
-          <span class="audit-sha">${e.sha}</span>
-          <span>·</span>
-          <span>${escH(e.author)}</span>
-          <span>·</span>
-          <span>${new Date(e.date).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</span>
-          <span>·</span>
-          <a class="audit-link" href="${escA(e.url)}" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a>
+    el.innerHTML = entries.map(e => {
+      const date        = new Date(e.timestamp).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' });
+      const actionLabel = e.action === 'revert' ? 'Reverted' : 'Updated';
+
+      const diffHtml = (e.changedFields || []).map(f => {
+        const beforeVal = e.before?.[f] === null ? '(not previously set)' : truncate(e.before?.[f], 400);
+        const afterVal  = e.action === 'revert' ? '(reverted to original)' : truncate(e.after?.[f], 400);
+        return `<div class="diff-field">
+          <span class="diff-field-name">${escH(f)}</span>
+          <div class="diff-row">
+            <span class="diff-label before">Before</span>
+            <span class="diff-text">${escH(beforeVal)}</span>
+          </div>
+          <div class="diff-row">
+            <span class="diff-label after">After</span>
+            <span class="diff-text">${escH(afterVal)}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `<div class="audit-entry">
+        <div class="audit-header">
+          <span class="audit-action ${escH(e.action)}">${escH(actionLabel)}</span>
+          <span class="audit-section">${escH(e.divisionKey)} / ${escH(e.sectionId)}</span>
+          <span class="audit-date">${date}</span>
         </div>
-      </div>`).join('');
+        <details class="audit-diff">
+          <summary>Show changes (${escH((e.changedFields || []).join(', '))})</summary>
+          ${diffHtml}
+        </details>
+      </div>`;
+    }).join('');
   } catch (err) {
     el.innerHTML = `<p class="empty-msg" style="color:#c0392b">Failed to load: ${escH(err.message)}</p>`;
   }

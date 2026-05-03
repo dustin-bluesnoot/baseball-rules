@@ -1,16 +1,9 @@
-const { Octokit } = require('@octokit/rest');
-
-const OWNER  = 'dustin-bluesnoot';
-const REPO   = 'baseball-rules';
-const PATH   = 'amendments.json';
-const BRANCH = 'main';
+const { kv } = require('@vercel/kv');
 
 const ALLOWED_FIELDS = ['badge', 'content', 'label', 'bcMinorSummary', 'tabaSummary'];
 
 module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).end('Method Not Allowed');
-  }
+  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
   const auth = req.headers['authorization'] || '';
   if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
@@ -22,7 +15,6 @@ module.exports = async function handler(req, res) {
   if (!divisionKey || !sectionType || !sectionId || !changes || typeof changes !== 'object') {
     return res.status(400).json({ error: 'Missing required fields' });
   }
-
   if (!['additions', 'overrides'].includes(sectionType)) {
     return res.status(400).json({ error: 'Invalid sectionType' });
   }
@@ -38,54 +30,40 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No valid fields to update' });
   }
 
-  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+  const amendments = await kv.get('amendments') || {};
 
-  // Read current amendments.json
-  let current = {};
-  let sha;
-  try {
-    const { data } = await octokit.rest.repos.getContent({
-      owner: OWNER, repo: REPO, path: PATH, ref: BRANCH,
-    });
-    current = JSON.parse(Buffer.from(data.content, 'base64').toString('utf8'));
-    sha = data.sha;
-  } catch (err) {
-    if (err.status !== 404) throw err;
+  // Capture before values for audit log
+  const existing = amendments?.[divisionKey]?.[sectionType]?.[sectionId] || {};
+  const before = {};
+  for (const field of Object.keys(sanitized)) {
+    before[field] = existing[field] ?? null;
   }
 
   // Deep merge
-  if (!current[divisionKey])                           current[divisionKey] = {};
-  if (!current[divisionKey][sectionType])              current[divisionKey][sectionType] = {};
-  if (!current[divisionKey][sectionType][sectionId])   current[divisionKey][sectionType][sectionId] = {};
-  Object.assign(current[divisionKey][sectionType][sectionId], sanitized);
+  if (!amendments[divisionKey])                           amendments[divisionKey] = {};
+  if (!amendments[divisionKey][sectionType])              amendments[divisionKey][sectionType] = {};
+  if (!amendments[divisionKey][sectionType][sectionId])   amendments[divisionKey][sectionType][sectionId] = {};
+  Object.assign(amendments[divisionKey][sectionType][sectionId], sanitized);
 
-  const changedFields = Object.keys(sanitized).join(', ');
-  const message = `CMS: ${divisionKey}/${sectionId} — update ${changedFields} [admin]`;
+  const timestamp = new Date().toISOString();
+  amendments[divisionKey][sectionType][sectionId]._meta = { updated: timestamp, author: 'admin' };
 
-  // Write 1: the content change
-  const { data: write1 } = await octokit.rest.repos.createOrUpdateFileContents({
-    owner: OWNER, repo: REPO, path: PATH, branch: BRANCH,
-    message,
-    content: Buffer.from(JSON.stringify(current, null, 2) + '\n').toString('base64'),
-    ...(sha ? { sha } : {}),
+  await kv.set('amendments', amendments);
+
+  // Prepend audit log entry
+  const auditLog = await kv.get('audit_log') || [];
+  auditLog.unshift({
+    id:            Date.now().toString(),
+    timestamp,
+    action:        'update',
+    divisionKey,
+    sectionType,
+    sectionId,
+    changedFields: Object.keys(sanitized),
+    before,
+    after:         sanitized,
   });
+  await kv.set('audit_log', auditLog.slice(0, 200));
 
-  // Write 2: store metadata pointing back to the content-change commit
-  const amendUrl = `https://github.com/${OWNER}/${REPO}/commit/${write1.commit.sha}`;
-  const updated  = write1.commit.author.date;
-
-  const { data: fileState } = await octokit.rest.repos.getContent({
-    owner: OWNER, repo: REPO, path: PATH, ref: BRANCH,
-  });
-
-  current[divisionKey][sectionType][sectionId]._meta = { updated, url: amendUrl, author: 'admin' };
-
-  await octokit.rest.repos.createOrUpdateFileContents({
-    owner: OWNER, repo: REPO, path: PATH, branch: BRANCH,
-    message: `CMS: meta — ${divisionKey}/${sectionId} [admin]`,
-    content: Buffer.from(JSON.stringify(current, null, 2) + '\n').toString('base64'),
-    sha: fileState.sha,
-  });
-
-  return res.status(200).json({ success: true, message });
+  return res.status(200).json({ success: true });
 };

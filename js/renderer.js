@@ -14,12 +14,12 @@ window.Rulebook = (() => {
   // ─── Entry point ─────────────────────────────────────────
   async function init(divisionParam) {
     try {
-      const resp = await fetch('/amendments.json');
+      const resp = await fetch('/api/amendments');
       if (resp.ok) {
         const amendments = await resp.json();
         if (amendments && typeof amendments === 'object') applyAmendments(amendments);
       }
-    } catch (e) { /* proceed with base data if amendments.json is unavailable */ }
+    } catch (e) { /* proceed with base data if KV is unavailable */ }
 
     const key = divisionParam ? divisionParam.toLowerCase() : null;
     if (key && window.TABADivisions[key]) {
@@ -364,10 +364,7 @@ window.Rulebook = (() => {
     const date = new Date(meta.updated).toLocaleDateString('en-CA', {
       year: 'numeric', month: 'long', day: 'numeric',
     });
-    const link = meta.url
-      ? ` · <a href="${meta.url}" target="_blank" rel="noopener" class="amendment-link">View change ↗</a>`
-      : '';
-    return `<div class="amendment-attr">Amended ${date}${link}</div>`;
+    return `<div class="amendment-attr">Amended ${date}</div>`;
   }
 
   function buildAddition(addition) {
