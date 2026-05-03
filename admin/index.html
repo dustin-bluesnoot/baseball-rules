@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TABA Rule Editor — Admin</title>
+  <!-- Netlify Identity widget (handles login/logout UI and JWT management) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Load base division data so the editor can show current values -->
+  <script src="../js/taba-divisions.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #f4f6f9; color: #1a1a2e; font-size: 14px; line-height: 1.5;
+    }
+
+    /* ── Login gate ─────────────────────────────── */
+    #login-gate {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: #0d2240;
+    }
+    .login-box {
+      background: #fff; border-radius: 10px; padding: 2.5rem 2rem;
+      text-align: center; width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    }
+    .login-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .login-box h1 { font-size: 1.25rem; font-weight: 700; margin-bottom: .4rem; }
+    .login-box p  { color: #666; font-size: .85rem; margin-bottom: 1.5rem; line-height: 1.5; }
+    #login-btn {
+      background: #0d2240; color: #fff; border: none; border-radius: 6px;
+      padding: .65rem 1.75rem; font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: background .15s; width: 100%;
+    }
+    #login-btn:hover { background: #163462; }
+
+    /* ── App shell ──────────────────────────────── */
+    #admin-app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    header {
+      background: #0d2240; color: #fff; padding: .7rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
+    }
+    .header-left { display: flex; align-items: center; gap: .7rem; }
+    .header-logo { font-size: 1.3rem; }
+    header h1 { font-size: .95rem; font-weight: 700; }
+    header .header-sub {
+      font-size: .68rem; color: rgba(255,255,255,.45);
+      font-weight: 400; margin-left: .5rem;
+    }
+    .header-right { display: flex; align-items: center; gap: .75rem; }
+    #user-email { font-size: .75rem; color: rgba(255,255,255,.6); }
+    #logout-btn {
+      background: rgba(255,255,255,.12); color: #fff;
+      border: 1px solid rgba(255,255,255,.25); border-radius: 4px;
+      padding: .28rem .7rem; font-size: .75rem; cursor: pointer;
+      transition: background .15s;
+    }
+    #logout-btn:hover { background: rgba(255,255,255,.22); }
+
+    /* ── Tabs ───────────────────────────────────── */
+    .tab-bar {
+      background: #fff; border-bottom: 2px solid #e4e7ef;
+      padding: 0 1.5rem; display: flex;
+    }
+    .tab-btn {
+      background: none; border: none; padding: .7rem 1.1rem;
+      font-size: .85rem; font-weight: 500; cursor: pointer;
+      color: #666; position: relative; transition: color .15s;
+    }
+    .tab-btn:hover { color: #0d2240; }
+    .tab-btn.active { color: #0d2240; }
+    .tab-btn.active::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+      height: 2px; background: #0d2240;
+    }
+
+    /* ── Tab panes ──────────────────────────────── */
+    .tab-pane { max-width: 860px; margin: 0 auto; padding: 1.5rem; width: 100%; }
+
+    /* ── Toolbar ────────────────────────────────── */
+    .toolbar {
+      background: #fff; border: 1px solid #dde1eb; border-radius: 8px;
+      padding: .8rem 1.1rem; margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+    }
+    .toolbar label { font-size: .8rem; font-weight: 600; color: #555; }
+    #div-select {
+      background: #f8f9fc; border: 1px solid #c9d0df; border-radius: 5px;
+      padding: .35rem .7rem; font-size: .85rem; color: #1a1a2e;
+      min-width: 220px; cursor: pointer;
+    }
+    .toolbar-note {
+      font-size: .73rem; color: #888; margin-left: auto;
+      font-style: italic;
+    }
+
+    /* ── Section groups ─────────────────────────── */
+    .section-group { margin-bottom: 1.5rem; }
+    .section-group-title {
+      font-size: .67rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: #888;
+      padding: .25rem 0 .55rem; border-bottom: 1px solid #e4e7ef;
+      margin-bottom: .75rem;
+    }
+
+    /* ── Rule cards (collapsible via <details>) ── */
+    .rule-card {
+      background: #fff; border: 1px solid #dde1eb; border-radius: 8px;
+      margin-bottom: .55rem; overflow: hidden; transition: border-color .2s;
+    }
+    .rule-card.amended { border-color: #2ecc71; }
+
+    .rule-card > summary {
+      display: flex; align-items: center; gap: .6rem;
+      padding: .7rem 1rem; cursor: pointer; user-select: none;
+      list-style: none;
+    }
+    .rule-card > summary::-webkit-details-marker { display: none; }
+    .rule-card > summary::before {
+      content: '▶'; font-size: .5rem; color: #aaa; flex-shrink: 0;
+      transition: transform .2s;
+    }
+    .rule-card[open] > summary::before { transform: rotate(90deg); }
+
+    .card-badge {
+      font-size: .6rem; font-weight: 600; padding: .1rem .4rem;
+      border-radius: 3px; background: #e8eaf5; color: #444;
+      letter-spacing: .04em; flex-shrink: 0; white-space: nowrap;
+    }
+    .card-rule-id {
+      font-family: 'Menlo', 'Courier New', monospace;
+      font-size: .67rem; color: #888; flex-shrink: 0;
+    }
+    .card-title { font-size: .88rem; font-weight: 600; flex: 1; }
+    .amended-tag {
+      font-size: .58rem; background: #d4f5e2; color: #1a7a4a;
+      font-weight: 700; padding: .08rem .38rem; border-radius: 10px;
+      letter-spacing: .05em; flex-shrink: 0;
+    }
+
+    /* ── Card body ──────────────────────────────── */
+    .card-body {
+      padding: 1rem 1.1rem 1.1rem;
+      border-top: 1px solid #e4e7ef;
+    }
+
+    /* ── Form fields ────────────────────────────── */
+    .field { margin-bottom: .9rem; }
+    .field:last-of-type { margin-bottom: 0; }
+
+    .field label {
+      display: block; font-size: .68rem; font-weight: 700; color: #555;
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: .28rem;
+    }
+    .field input[type="text"],
+    .field textarea {
+      width: 100%; border: 1px solid #c9d0df; border-radius: 5px;
+      padding: .42rem .65rem; font-size: .83rem; color: #1a1a2e;
+      font-family: inherit; background: #fafbfd;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field input[type="text"]:focus,
+    .field textarea:focus {
+      outline: none; border-color: #0d2240;
+      box-shadow: 0 0 0 3px rgba(13,34,64,.08);
+      background: #fff;
+    }
+    .field textarea {
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: .74rem; resize: vertical; min-height: 90px;
+    }
+    .field textarea.content-area { min-height: 200px; }
+    .field .hint { font-size: .7rem; color: #888; margin-top: .22rem; }
+
+    /* ── HTML preview ───────────────────────────── */
+    .preview-wrap { margin-bottom: .5rem; }
+    .btn-preview {
+      background: none; border: 1px solid #c9d0df; border-radius: 4px;
+      padding: .18rem .55rem; font-size: .7rem; cursor: pointer; color: #555;
+      transition: background .15s;
+    }
+    .btn-preview:hover { background: #f0f2f8; }
+    .preview-pane {
+      display: none; margin-top: .4rem;
+      border: 1px solid #c9d0df; border-radius: 5px;
+      padding: .7rem .9rem; background: #fafbfd;
+      font-size: .84rem; line-height: 1.6;
+      max-height: 260px; overflow-y: auto;
+    }
+    .preview-pane.visible { display: block; }
+
+    /* ── Card actions ───────────────────────────── */
+    .card-actions {
+      display: flex; align-items: center; gap: .55rem;
+      margin-top: .9rem; flex-wrap: wrap;
+    }
+    .btn-save {
+      background: #0d2240; color: #fff; border: none; border-radius: 5px;
+      padding: .42rem 1rem; font-size: .8rem; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-save:hover:not(:disabled) { background: #163462; }
+    .btn-save:disabled { opacity: .5; cursor: default; }
+
+    .btn-revert {
+      background: none; color: #c0392b; border: 1px solid #f5c0b8;
+      border-radius: 5px; padding: .38rem .85rem; font-size: .75rem;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-revert:hover:not(:disabled) { background: #fff4f4; }
+    .btn-revert:disabled { opacity: .5; cursor: default; }
+
+    .save-status { font-size: .75rem; }
+    .save-status.ok  { color: #27ae60; }
+    .save-status.err { color: #c0392b; }
+
+    /* ── Audit log ──────────────────────────────── */
+    .audit-entry {
+      background: #fff; border: 1px solid #dde1eb; border-radius: 8px;
+      padding: .8rem 1.1rem; margin-bottom: .55rem;
+    }
+    .audit-msg { font-size: .86rem; font-weight: 600; margin-bottom: .2rem; }
+    .audit-meta { font-size: .72rem; color: #888; display: flex; gap: .4rem; flex-wrap: wrap; }
+    .audit-sha { font-family: 'Menlo', monospace; background: #f0f2f8; padding: .05rem .3rem; border-radius: 3px; }
+    .audit-link { color: #1a5276; text-decoration: none; }
+    .audit-link:hover { text-decoration: underline; }
+
+    .empty-msg { color: #888; font-size: .86rem; text-align: center; padding: 2.5rem 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── Login gate ──────────────────────────────────────────── -->
+<div id="login-gate">
+  <div class="login-box">
+    <div class="login-icon">⚾</div>
+    <h1>TABA Rule Editor</h1>
+    <p>Administrative access only.<br>Log in with your TABA admin account.</p>
+    <button id="login-btn">Log in</button>
+  </div>
+</div>
+
+<!-- ── Admin application ────────────────────────────────────── -->
+<div id="admin-app" hidden>
+
+  <header>
+    <div class="header-left">
+      <span class="header-logo">⚾</span>
+      <h1>TABA Rule Editor <span class="header-sub">Admin</span></h1>
+    </div>
+    <div class="header-right">
+      <span id="user-email"></span>
+      <button id="logout-btn">Log out</button>
+    </div>
+  </header>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="editor">Rule Editor</button>
+    <button class="tab-btn" data-tab="audit">Audit Log</button>
+  </div>
+
+  <div id="tab-editor" class="tab-pane">
+    <div class="toolbar">
+      <label for="div-select">Division</label>
+      <select id="div-select"></select>
+      <span class="toolbar-note">Changes are committed to GitHub and deployed in ~60 s.</span>
+    </div>
+    <div id="editor-content"></div>
+  </div>
+
+  <div id="tab-audit" class="tab-pane" hidden>
+    <div id="audit-content"><p class="empty-msg">Loading audit log…</p></div>
+  </div>
+
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   State
+   ════════════════════════════════════════════════════════════ */
+let baseData    = {};  // deep-cloned window.TABADivisions (unmodified base)
+let amendments  = {};  // fetched from amendments.json
+let currentUser = null;
+let cardSeq     = 0;
+
+/* ════════════════════════════════════════════════════════════
+   Netlify Identity
+   ════════════════════════════════════════════════════════════ */
+document.getElementById('login-btn').addEventListener('click', () => netlify.identity.open());
+document.getElementById('logout-btn').addEventListener('click', () => netlify.identity.logout());
+
+netlify.identity.on('init',   user => { if (user) enterApp(user); });
+netlify.identity.on('login',  user => { netlify.identity.close(); enterApp(user); });
+netlify.identity.on('logout', ()   => {
+  currentUser = null;
+  document.getElementById('admin-app').hidden = true;
+  document.getElementById('login-gate').hidden = false;
+});
+
+/* ════════════════════════════════════════════════════════════
+   App entry point
+   ════════════════════════════════════════════════════════════ */
+async function enterApp(user) {
+  currentUser = user;
+  document.getElementById('login-gate').hidden = true;
+  document.getElementById('admin-app').hidden  = false;
+  document.getElementById('user-email').textContent = user.email;
+
+  // Snapshot the unmodified base data
+  baseData = JSON.parse(JSON.stringify(window.TABADivisions));
+
+  // Fetch current amendments
+  await loadAmendments();
+
+  // Build division selector
+  const sel = document.getElementById('div-select');
+  sel.innerHTML = '';
+  Object.entries(baseData).forEach(([key, div]) => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = `${div.badge} — ${div.name}`;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => renderEditor(sel.value));
+  renderEditor(sel.value);
+}
+
+/* ════════════════════════════════════════════════════════════
+   Load amendments.json
+   ════════════════════════════════════════════════════════════ */
+async function loadAmendments() {
+  try {
+    const r = await fetch('../amendments.json?nc=' + Date.now());
+    amendments = r.ok ? await r.json() : {};
+  } catch {
+    amendments = {};
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Helpers: amendments access
+   ════════════════════════════════════════════════════════════ */
+function amended(divKey, sectionType, sectionId) {
+  return !!(amendments?.[divKey]?.[sectionType]?.[sectionId]);
+}
+
+function effectiveVal(divKey, sectionType, sectionId, field, fallback) {
+  return amendments?.[divKey]?.[sectionType]?.[sectionId]?.[field] ?? fallback;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Render editor for a division
+   ════════════════════════════════════════════════════════════ */
+function renderEditor(divKey) {
+  const div = baseData[divKey];
+  const el  = document.getElementById('editor-content');
+  let html  = '';
+
+  // TABA additions
+  const additions = div.additions || [];
+  if (additions.length) {
+    html += `<div class="section-group">
+      <div class="section-group-title">TABA Local Rules — Additions</div>`;
+    additions.forEach(a => {
+      html += buildAdditionCard(divKey, a);
+    });
+    html += `</div>`;
+  }
+
+  // BC Minor overrides
+  const overrideEntries = Object.entries(div.overrides || {});
+  if (overrideEntries.length) {
+    html += `<div class="section-group">
+      <div class="section-group-title">BC Minor Overrides</div>`;
+    overrideEntries.forEach(([ruleId, ov]) => {
+      html += buildOverrideCard(divKey, ruleId, ov);
+    });
+    html += `</div>`;
+  }
+
+  if (!html) html = '<p class="empty-msg">No editable sections for this division.</p>';
+  el.innerHTML = html;
+  attachCardListeners(el, divKey);
+}
+
+/* ── Build addition card ────────────────────────────────────── */
+function buildAdditionCard(divKey, addition) {
+  const cid  = 'c' + (++cardSeq);
+  const sid  = addition.id;
+  const type = 'additions';
+  const isAmended = amended(divKey, type, sid);
+
+  const badge   = effectiveVal(divKey, type, sid, 'badge',   addition.badge   || '');
+  const content = effectiveVal(divKey, type, sid, 'content', addition.content || '');
+
+  return `
+    <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
+      <summary>
+        <span class="card-badge">${escH(badge)}</span>
+        <span class="card-title">${escH(addition.title)}</span>
+        ${isAmended ? '<span class="amended-tag">AMENDED</span>' : ''}
+      </summary>
+      <div class="card-body">
+        ${fieldText(cid, 'badge', 'Badge label', badge, 'Short label shown in the rule header.')}
+        ${fieldContent(cid, 'content', content)}
+        ${actions(cid, divKey, type, sid, 'badge,content', isAmended)}
+      </div>
+    </details>`;
+}
+
+/* ── Build override card ────────────────────────────────────── */
+function buildOverrideCard(divKey, ruleId, ov) {
+  const cid  = 'c' + (++cardSeq);
+  const type = 'overrides';
+  const isAmended = amended(divKey, type, ruleId);
+
+  const label         = effectiveVal(divKey, type, ruleId, 'label',         ov.label         || ruleId);
+  const bcMinorSum    = effectiveVal(divKey, type, ruleId, 'bcMinorSummary', ov.bcMinorSummary || '');
+  const tabaSum       = effectiveVal(divKey, type, ruleId, 'tabaSummary',   ov.tabaSummary   || '');
+  const content       = effectiveVal(divKey, type, ruleId, 'content',       ov.content       || '');
+
+  return `
+    <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
+      <summary>
+        <span class="card-rule-id">${escH(ruleId)}</span>
+        <span class="card-title">${escH(label)}</span>
+        ${isAmended ? '<span class="amended-tag">AMENDED</span>' : ''}
+      </summary>
+      <div class="card-body">
+        ${fieldText(cid, 'label', 'Override panel label', label, '')}
+        ${fieldTextarea(cid, 'bcMinorSummary', 'BC Minor Summary (left column)', bcMinorSum)}
+        ${fieldTextarea(cid, 'tabaSummary',    'TABA Summary (right column header)', tabaSum)}
+        ${fieldContent(cid, 'content', content)}
+        ${actions(cid, divKey, type, ruleId, 'label,bcMinorSummary,tabaSummary,content', isAmended)}
+      </div>
+    </details>`;
+}
+
+/* ── Field helpers ──────────────────────────────────────────── */
+function fieldText(cid, field, label, value, hint) {
+  return `<div class="field">
+    <label>${label}</label>
+    <input type="text" id="${cid}-${field}" value="${escA(value)}">
+    ${hint ? `<p class="hint">${hint}</p>` : ''}
+  </div>`;
+}
+
+function fieldTextarea(cid, field, label, value) {
+  return `<div class="field">
+    <label>${label}</label>
+    <textarea id="${cid}-${field}">${escT(value)}</textarea>
+  </div>`;
+}
+
+function fieldContent(cid, field, value) {
+  const previewId = cid + '-' + field + '-preview';
+  return `<div class="field">
+    <label>Content (HTML)</label>
+    <div class="preview-wrap">
+      <button class="btn-preview" data-preview-toggle="${previewId}" data-preview-src="${cid}-${field}">Preview HTML</button>
+    </div>
+    <textarea id="${cid}-${field}" class="content-area">${escT(value)}</textarea>
+    <div class="preview-pane" id="${previewId}"></div>
+    <p class="hint">HTML rendered directly — use existing callout/table classes from the rulebook.</p>
+  </div>`;
+}
+
+function actions(cid, divKey, type, sectionId, fields, isAmended) {
+  const revert = isAmended
+    ? `<button class="btn-revert"
+         data-div="${divKey}" data-type="${type}" data-id="${sectionId}" data-cid="${cid}">
+         Revert to original
+       </button>`
+    : '';
+  return `<div class="card-actions">
+    <button class="btn-save"
+      data-div="${divKey}" data-type="${type}" data-id="${sectionId}"
+      data-cid="${cid}" data-fields="${fields}">
+      Save changes
+    </button>
+    ${revert}
+    <span class="save-status" id="${cid}-status"></span>
+  </div>`;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Event listeners
+   ════════════════════════════════════════════════════════════ */
+function attachCardListeners(container, divKey) {
+  // Preview toggles
+  container.querySelectorAll('[data-preview-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pane = document.getElementById(btn.dataset.previewToggle);
+      const src  = document.getElementById(btn.dataset.previewSrc);
+      if (pane.classList.toggle('visible')) {
+        pane.innerHTML = src.value;
+        btn.textContent = 'Hide preview';
+      } else {
+        btn.textContent = 'Preview HTML';
+      }
+    });
+  });
+
+  // Save buttons
+  container.querySelectorAll('.btn-save').forEach(btn => {
+    btn.addEventListener('click', () => handleSave(btn, divKey));
+  });
+
+  // Revert buttons
+  container.querySelectorAll('.btn-revert').forEach(btn => {
+    btn.addEventListener('click', () => handleRevert(btn, divKey));
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   Save handler
+   ════════════════════════════════════════════════════════════ */
+async function handleSave(btn, divKey) {
+  const { div, type: sectionType, id: sectionId, cid, fields } = btn.dataset;
+  const statusEl = document.getElementById(cid + '-status');
+  btn.disabled = true;
+  statusEl.textContent = 'Saving…';
+  statusEl.className = 'save-status';
+
+  const changes = {};
+  fields.split(',').forEach(f => {
+    const el = document.getElementById(cid + '-' + f);
+    if (el) changes[f] = el.value;
+  });
+
+  try {
+    const token = await currentUser.jwt();
+    const res = await fetch('/.netlify/functions/save-amendment', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ divisionKey: div, sectionType, sectionId, changes }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Server error ${res.status}`);
+    }
+
+    // Update local amendments cache
+    if (!amendments[div])                          amendments[div] = {};
+    if (!amendments[div][sectionType])             amendments[div][sectionType] = {};
+    if (!amendments[div][sectionType][sectionId])  amendments[div][sectionType][sectionId] = {};
+    Object.assign(amendments[div][sectionType][sectionId], changes);
+
+    // Mark card visually
+    const details = document.getElementById(cid + '-details');
+    if (details && !details.classList.contains('amended')) {
+      details.classList.add('amended');
+      const titleEl = details.querySelector('.card-title');
+      if (titleEl && !details.querySelector('.amended-tag')) {
+        titleEl.insertAdjacentHTML('afterend', '<span class="amended-tag">AMENDED</span>');
+      }
+    }
+
+    statusEl.textContent = '✓ Saved — site redeploys in ~60 s.';
+    statusEl.className = 'save-status ok';
+  } catch (err) {
+    statusEl.textContent = '✗ ' + err.message;
+    statusEl.className = 'save-status err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Revert handler
+   ════════════════════════════════════════════════════════════ */
+async function handleRevert(btn, divKey) {
+  const { div, type: sectionType, id: sectionId, cid } = btn.dataset;
+  if (!confirm(`Remove all amendments for "${sectionId}" and revert to the original wording?`)) return;
+
+  const statusEl = document.getElementById(cid + '-status');
+  btn.disabled = true;
+  statusEl.textContent = 'Reverting…';
+  statusEl.className = 'save-status';
+
+  try {
+    const token = await currentUser.jwt();
+    const res = await fetch('/.netlify/functions/revert-amendment', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ divisionKey: div, sectionType, sectionId }),
+    });
+
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+    // Remove from local cache
+    delete amendments?.[div]?.[sectionType]?.[sectionId];
+
+    statusEl.textContent = '✓ Reverted — re-rendering…';
+    statusEl.className = 'save-status ok';
+
+    // Re-render to show original values
+    setTimeout(() => renderEditor(document.getElementById('div-select').value), 600);
+  } catch (err) {
+    statusEl.textContent = '✗ ' + err.message;
+    statusEl.className = 'save-status err';
+    btn.disabled = false;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Audit log
+   ════════════════════════════════════════════════════════════ */
+async function loadAuditLog() {
+  const el = document.getElementById('audit-content');
+  el.innerHTML = '<p class="empty-msg">Loading…</p>';
+  try {
+    const token = await currentUser.jwt();
+    const res = await fetch('/.netlify/functions/audit-log', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error(`Server error ${res.status}`);
+    const entries = await res.json();
+
+    if (!entries.length) {
+      el.innerHTML = '<p class="empty-msg">No amendments recorded yet. All rules are at their original values.</p>';
+      return;
+    }
+
+    el.innerHTML = entries.map(e => `
+      <div class="audit-entry">
+        <div class="audit-msg">${escH(e.message)}</div>
+        <div class="audit-meta">
+          <span class="audit-sha">${e.sha}</span>
+          <span>·</span>
+          <span>${escH(e.author)}</span>
+          <span>·</span>
+          <span>${new Date(e.date).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+          <span>·</span>
+          <a class="audit-link" href="${escA(e.url)}" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a>
+        </div>
+      </div>`).join('');
+  } catch (err) {
+    el.innerHTML = `<p class="empty-msg" style="color:#c0392b">Failed to load: ${escH(err.message)}</p>`;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Tab switching
+   ════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById('tab-editor').hidden = (tab !== 'editor');
+    document.getElementById('tab-audit').hidden  = (tab !== 'audit');
+    if (tab === 'audit') loadAuditLog();
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   Escape helpers
+   ════════════════════════════════════════════════════════════ */
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escA(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function escT(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

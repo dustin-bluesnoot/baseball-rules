@@ -56,7 +56,7 @@
       else {
         var params   = new URLSearchParams(window.location.search);
         var division = params.get('division');
-        window.Rulebook.init(division);
+        window.Rulebook.init(division).catch(err => showError(err.message));
       }
     } catch(err) {
       showError(err.message + '<br><small style="color:#999">' + (err.stack || '').replace(/\n/g,'<br>') + '</small>');
