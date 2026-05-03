@@ -1,4 +1,8 @@
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+});
 
 const ALLOWED_FIELDS = ['badge', 'content', 'label', 'bcMinorSummary', 'tabaSummary'];
 
@@ -30,7 +34,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No valid fields to update' });
   }
 
-  const amendments = await kv.get('amendments') || {};
+  const amendments = await redis.get('amendments') || {};
 
   // Capture before values for audit log
   const existing = amendments?.[divisionKey]?.[sectionType]?.[sectionId] || {};
@@ -48,10 +52,10 @@ module.exports = async function handler(req, res) {
   const timestamp = new Date().toISOString();
   amendments[divisionKey][sectionType][sectionId]._meta = { updated: timestamp, author: 'admin' };
 
-  await kv.set('amendments', amendments);
+  await redis.set('amendments', amendments);
 
   // Prepend audit log entry
-  const auditLog = await kv.get('audit_log') || [];
+  const auditLog = await redis.get('audit_log') || [];
   auditLog.unshift({
     id:            Date.now().toString(),
     timestamp,
@@ -63,7 +67,7 @@ module.exports = async function handler(req, res) {
     before,
     after:         sanitized,
   });
-  await kv.set('audit_log', auditLog.slice(0, 200));
+  await redis.set('audit_log', auditLog.slice(0, 200));
 
   return res.status(200).json({ success: true });
 };

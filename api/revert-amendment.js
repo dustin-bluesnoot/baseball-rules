@@ -1,4 +1,8 @@
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+});
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
@@ -13,7 +17,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  const amendments = await kv.get('amendments') || {};
+  const amendments = await redis.get('amendments') || {};
   const existing   = amendments?.[divisionKey]?.[sectionType]?.[sectionId];
 
   if (existing) {
@@ -24,10 +28,10 @@ module.exports = async function handler(req, res) {
     if (Object.keys(amendments[divisionKey] || {}).length === 0) {
       delete amendments[divisionKey];
     }
-    await kv.set('amendments', amendments);
+    await redis.set('amendments', amendments);
 
     const timestamp = new Date().toISOString();
-    const auditLog  = await kv.get('audit_log') || [];
+    const auditLog  = await redis.get('audit_log') || [];
     auditLog.unshift({
       id:            Date.now().toString(),
       timestamp,
@@ -39,7 +43,7 @@ module.exports = async function handler(req, res) {
       before:        existing,
       after:         null,
     });
-    await kv.set('audit_log', auditLog.slice(0, 200));
+    await redis.set('audit_log', auditLog.slice(0, 200));
   }
 
   return res.status(200).json({ success: true });
