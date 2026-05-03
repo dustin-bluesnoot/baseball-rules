@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TABA Rule Editor — Admin</title>
   <!-- Load base division data so the editor can show current values -->
-  <script src="../js/taba-divisions.js"></script>
+  <script src="/js/taba-divisions.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -364,7 +364,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
     });
     if (res.ok) {
       sessionStorage.setItem('adminToken', pw);
-      enterApp();
+      await enterApp();
     } else if (res.status === 401) {
       errEl.textContent = 'Incorrect password.';
       errEl.hidden = false;
@@ -372,9 +372,9 @@ document.getElementById('login-form').addEventListener('submit', async e => {
       errEl.textContent = `Server error (${res.status}) — check Vercel env vars and redeploy.`;
       errEl.hidden = false;
     }
-  } catch {
+  } catch (err) {
     errEl.hidden = false;
-    errEl.textContent = 'Connection error — try again.';
+    errEl.textContent = err?.message ? `Error: ${err.message}` : 'Connection error — try again.';
   } finally {
     btn.disabled = false;
     btn.textContent = 'Log in';
@@ -396,7 +396,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
     const res = await fetch('/api/audit-log', {
       headers: { 'Authorization': `Bearer ${token}` },
     });
-    if (res.ok) { enterApp(); return; }
+    if (res.ok) { await enterApp(); return; }
   } catch { /* fall through to login gate */ }
   sessionStorage.removeItem('adminToken');
 })();
