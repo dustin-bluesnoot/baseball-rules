@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TABA Rule Editor — Admin</title>
-  <!-- Netlify Identity widget (handles login/logout UI and JWT management) -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <!-- Load base division data so the editor can show current values -->
   <script src="../js/taba-divisions.js"></script>
   <style>
@@ -29,12 +27,26 @@
     .login-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .login-box h1 { font-size: 1.25rem; font-weight: 700; margin-bottom: .4rem; }
     .login-box p  { color: #666; font-size: .85rem; margin-bottom: 1.5rem; line-height: 1.5; }
+    #login-password {
+      width: 100%; border: 1px solid #c9d0df; border-radius: 6px;
+      padding: .55rem .75rem; font-size: .9rem; color: #1a1a2e;
+      margin-bottom: .75rem; background: #fafbfd;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    #login-password:focus {
+      outline: none; border-color: #0d2240;
+      box-shadow: 0 0 0 3px rgba(13,34,64,.1);
+    }
     #login-btn {
       background: #0d2240; color: #fff; border: none; border-radius: 6px;
       padding: .65rem 1.75rem; font-size: .9rem; font-weight: 600;
       cursor: pointer; transition: background .15s; width: 100%;
     }
-    #login-btn:hover { background: #163462; }
+    #login-btn:hover:not(:disabled) { background: #163462; }
+    #login-btn:disabled { opacity: .55; cursor: default; }
+    #login-error {
+      margin-top: .75rem; color: #c0392b; font-size: .8rem; font-weight: 600;
+    }
 
     /* ── App shell ──────────────────────────────── */
     #admin-app { display: flex; flex-direction: column; min-height: 100vh; }
@@ -52,8 +64,6 @@
       font-size: .68rem; color: rgba(255,255,255,.45);
       font-weight: 400; margin-left: .5rem;
     }
-    .header-right { display: flex; align-items: center; gap: .75rem; }
-    #user-email { font-size: .75rem; color: rgba(255,255,255,.6); }
     #logout-btn {
       background: rgba(255,255,255,.12); color: #fff;
       border: 1px solid rgba(255,255,255,.25); border-radius: 4px;
@@ -240,8 +250,12 @@
   <div class="login-box">
     <div class="login-icon">⚾</div>
     <h1>TABA Rule Editor</h1>
-    <p>Administrative access only.<br>Log in with your TABA admin account.</p>
-    <button id="login-btn">Log in</button>
+    <p>Administrative access only.</p>
+    <form id="login-form">
+      <input type="password" id="login-password" placeholder="Admin password" autocomplete="current-password">
+      <button type="submit" id="login-btn">Log in</button>
+      <p id="login-error" hidden>Incorrect password.</p>
+    </form>
   </div>
 </div>
 
@@ -253,10 +267,7 @@
       <span class="header-logo">⚾</span>
       <h1>TABA Rule Editor <span class="header-sub">Admin</span></h1>
     </div>
-    <div class="header-right">
-      <span id="user-email"></span>
-      <button id="logout-btn">Log out</button>
-    </div>
+    <button id="logout-btn">Log out</button>
   </header>
 
   <div class="tab-bar">
@@ -283,33 +294,70 @@
 /* ════════════════════════════════════════════════════════════
    State
    ════════════════════════════════════════════════════════════ */
-let baseData    = {};  // deep-cloned window.TABADivisions (unmodified base)
-let amendments  = {};  // fetched from amendments.json
-let currentUser = null;
-let cardSeq     = 0;
+let baseData   = {};  // deep-cloned window.TABADivisions (unmodified base)
+let amendments = {};  // fetched from amendments.json
+let cardSeq    = 0;
 
 /* ════════════════════════════════════════════════════════════
-   Netlify Identity
+   Password auth
    ════════════════════════════════════════════════════════════ */
-document.getElementById('login-btn').addEventListener('click', () => netlify.identity.open());
-document.getElementById('logout-btn').addEventListener('click', () => netlify.identity.logout());
+function storedToken() { return sessionStorage.getItem('adminToken') || ''; }
+function authHeaders() { return { 'Authorization': `Bearer ${storedToken()}` }; }
 
-netlify.identity.on('init',   user => { if (user) enterApp(user); });
-netlify.identity.on('login',  user => { netlify.identity.close(); enterApp(user); });
-netlify.identity.on('logout', ()   => {
-  currentUser = null;
-  document.getElementById('admin-app').hidden = true;
-  document.getElementById('login-gate').hidden = false;
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pw    = document.getElementById('login-password').value;
+  const btn   = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  errEl.hidden = true;
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+
+  try {
+    const res = await fetch('/.netlify/functions/audit-log', {
+      headers: { 'Authorization': `Bearer ${pw}` },
+    });
+    if (res.ok) {
+      sessionStorage.setItem('adminToken', pw);
+      enterApp();
+    } else {
+      errEl.hidden = false;
+    }
+  } catch {
+    errEl.hidden = false;
+    errEl.textContent = 'Connection error — try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Log in';
+  }
 });
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('adminToken');
+  document.getElementById('admin-app').hidden  = true;
+  document.getElementById('login-gate').hidden = false;
+  document.getElementById('login-password').value = '';
+});
+
+// Auto-login if a session token is already stored
+(async () => {
+  const token = storedToken();
+  if (!token) return;
+  try {
+    const res = await fetch('/.netlify/functions/audit-log', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (res.ok) { enterApp(); return; }
+  } catch { /* fall through to login gate */ }
+  sessionStorage.removeItem('adminToken');
+})();
 
 /* ════════════════════════════════════════════════════════════
    App entry point
    ════════════════════════════════════════════════════════════ */
-async function enterApp(user) {
-  currentUser = user;
+async function enterApp() {
   document.getElementById('login-gate').hidden = true;
   document.getElementById('admin-app').hidden  = false;
-  document.getElementById('user-email').textContent = user.email;
 
   // Snapshot the unmodified base data
   baseData = JSON.parse(JSON.stringify(window.TABADivisions));
@@ -419,10 +467,10 @@ function buildOverrideCard(divKey, ruleId, ov) {
   const type = 'overrides';
   const isAmended = amended(divKey, type, ruleId);
 
-  const label         = effectiveVal(divKey, type, ruleId, 'label',         ov.label         || ruleId);
-  const bcMinorSum    = effectiveVal(divKey, type, ruleId, 'bcMinorSummary', ov.bcMinorSummary || '');
-  const tabaSum       = effectiveVal(divKey, type, ruleId, 'tabaSummary',   ov.tabaSummary   || '');
-  const content       = effectiveVal(divKey, type, ruleId, 'content',       ov.content       || '');
+  const label      = effectiveVal(divKey, type, ruleId, 'label',         ov.label         || ruleId);
+  const bcMinorSum = effectiveVal(divKey, type, ruleId, 'bcMinorSummary', ov.bcMinorSummary || '');
+  const tabaSum    = effectiveVal(divKey, type, ruleId, 'tabaSummary',   ov.tabaSummary   || '');
+  const content    = effectiveVal(divKey, type, ruleId, 'content',       ov.content       || '');
 
   return `
     <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
@@ -534,13 +582,9 @@ async function handleSave(btn, divKey) {
   });
 
   try {
-    const token = await currentUser.jwt();
     const res = await fetch('/.netlify/functions/save-amendment', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ divisionKey: div, sectionType, sectionId, changes }),
     });
 
@@ -588,13 +632,9 @@ async function handleRevert(btn, divKey) {
   statusEl.className = 'save-status';
 
   try {
-    const token = await currentUser.jwt();
     const res = await fetch('/.netlify/functions/revert-amendment', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ divisionKey: div, sectionType, sectionId }),
     });
 
@@ -622,10 +662,7 @@ async function loadAuditLog() {
   const el = document.getElementById('audit-content');
   el.innerHTML = '<p class="empty-msg">Loading…</p>';
   try {
-    const token = await currentUser.jwt();
-    const res = await fetch('/.netlify/functions/audit-log', {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const res = await fetch('/.netlify/functions/audit-log', { headers: authHeaders() });
     if (!res.ok) throw new Error(`Server error ${res.status}`);
     const entries = await res.json();
 

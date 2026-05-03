@@ -5,7 +5,7 @@
  * Merges field changes for a specific rule section into amendments.json
  * and commits the result to the main branch via GitHub API.
  *
- * Requires Netlify Identity JWT in Authorization header.
+ * Requires ADMIN_PASSWORD env var in Authorization: Bearer header.
  * Requires GITHUB_TOKEN env var (fine-grained PAT, Contents: read+write).
  */
 
@@ -23,9 +23,8 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  // Netlify Identity verification — populated automatically by Netlify gateway
-  const { user } = context.clientContext || {};
-  if (!user) {
+  const auth = event.headers['authorization'] || '';
+  if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
     return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
 
@@ -80,7 +79,7 @@ exports.handler = async (event, context) => {
   Object.assign(current[divisionKey][sectionType][sectionId], sanitized);
 
   const changedFields = Object.keys(sanitized).join(', ');
-  const message = `CMS: ${divisionKey}/${sectionId} — update ${changedFields} [${user.email}]`;
+  const message = `CMS: ${divisionKey}/${sectionId} — update ${changedFields} [admin]`;
 
   await octokit.rest.repos.createOrUpdateFileContents({
     owner: OWNER, repo: REPO, path: PATH, branch: BRANCH,

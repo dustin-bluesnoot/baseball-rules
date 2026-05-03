@@ -20,8 +20,8 @@ exports.handler = async (event, context) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const { user } = context.clientContext || {};
-  if (!user) {
+  const auth = event.headers['authorization'] || '';
+  if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
     return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
   }
 
