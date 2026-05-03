@@ -24,122 +24,6 @@
 window.TABADivisions = {
 
   /* ═══════════════════════════════════════════════════════════
-     9U — Tadpole (TABA Local)
-     ═══════════════════════════════════════════════════════════ */
-  "9u": {
-    name: "9U — Tadpole",
-    badge: "9U Tadpole",
-    color: "#b05a00",
-    group: "taba",
-    description: "TABA Home/Host Rules · Spring & Summer 2026",
-
-    overrides: {
-
-      "31.03": {
-        type: "differs",
-        label: "9U General Rules — TABA Pitching Machine Format",
-        bcMinorSummary: "BC Minor 9U: live pitching (coach or player), max 1 inning / 35 pitches per pitcher; 4 complete innings (max 6); 2 hr 15 min time limit; 9 players on field; inning ends on 3 outs or 4 runs; 10-run mercy rule after 5 innings; score is kept.",
-        tabaSummary: "TABA 9U uses a coach-operated pitching machine. 5 innings, 1:30 time limit, 10 players (4 outfielders), inning ends on 3 outs or 6 batters, no run limit, no mercy rule, no score kept.",
-        content: `
-          <div class="callout blue">
-            <p><strong>TABA 9U uses a coach-operated pitching machine.</strong> This format replaces BC Minor's pitching and scoring provisions in Rule 31.03 entirely. Pitch count and pitcher eligibility rules do not apply in TABA 9U.</p>
-          </div>
-          <table>
-            <thead><tr><th>Item</th><th>BC Minor 9U (Rule 31.03)</th><th>TABA 9U <span class="sb-badge badge-taba">TABA Home/Host Rule</span></th></tr></thead>
-            <tbody>
-              <tr><td class="hi">Pitching</td><td>Live — 1 inning / 35 pitches per pitcher max</td><td>Coach-operated pitching machine</td></tr>
-              <tr><td class="hi">Innings</td><td>4 complete (max 6)</td><td>5 innings</td></tr>
-              <tr><td class="hi">Time limit</td><td>2 hours 15 minutes</td><td>1 hour 30 minutes</td></tr>
-              <tr><td class="hi">Players on field</td><td>9</td><td>10 (including 4 outfielders)</td></tr>
-              <tr><td class="hi">Inning ends when</td><td>3 outs <em>or</em> 4 runs scored</td><td>3 outs <em>or</em> 6 batters faced</td></tr>
-              <tr><td class="hi">Run limit</td><td>4 runs per inning</td><td>None</td></tr>
-              <tr><td class="hi">Score</td><td>Kept</td><td>Not kept</td></tr>
-              <tr><td class="hi">Mercy rule</td><td>10-run rule after 5 innings</td><td>None</td></tr>
-            </tbody>
-          </table>`
-      }
-    },
-
-    additions: [
-      {
-        id: "taba-9u-precedence",
-        insertAfterRule: "1",
-        title: "9U Rule Scope & Precedence",
-        badge: "TABA Home/Host Rule",
-        content: `
-          <div class="callout blue">
-            <p><strong>These rules apply when TABA is the home association or tournament host.</strong> For away games, check the host association's published local rules first.</p>
-          </div>
-          <div class="callout navy">
-            <p><strong>Order of Precedence for 9U games (highest to lowest):</strong></p>
-            <ol class="nl">
-              <li><strong>Home/Host Association Local Rules</strong> — TABA rules apply at Tsawwassen fields or TABA-hosted tournaments. At away games, the host association's published local rules apply.</li>
-              <li><strong>Fraser Delta Interlock Rules</strong> — if the host association has no published local rule for the situation.</li>
-              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — if Interlock is silent.</li>
-              <li><strong>Official Rules of Baseball</strong> — if BC Minor is silent.</li>
-            </ol>
-          </div>`
-      },
-      {
-        id: "taba-9u-game-structure",
-        insertAfterRule: "22",
-        title: "9U Game Structure",
-        badge: "TABA Home/Host Rule",
-        content: `
-          <ul class="rl">
-            <li>Games are <strong>5 innings</strong>.</li>
-            <li>No new inning shall start after <strong>1 hour and 30 minutes</strong> from the scheduled start time.</li>
-            <li>Each half-inning ends after <strong>3 outs</strong> or <strong>6 batters</strong> have come to the plate, whichever comes first.</li>
-          </ul>
-          <div class="callout red">
-            <p><strong>No score is kept.</strong> There is no run limit and no mercy rule in TABA 9U.</p>
-          </div>
-          <p class="note">Three innings constitute a complete game in the event of weather or darkness.</p>`
-      },
-      {
-        id: "taba-9u-field",
-        insertAfterRule: "18",
-        title: "9U Field Setup & Equipment",
-        badge: "TABA Home/Host Rule",
-        content: `
-          <ul class="rl">
-            <li><strong>10 players</strong> take the field: the standard 6 infield positions plus <strong>4 outfielders</strong>.</li>
-            <li>A <strong>real baseball (45cc)</strong> is used — not a safety or reduced-impact ball.</li>
-          </ul>`
-      },
-      {
-        id: "taba-9u-pitching",
-        insertAfterRule: "24",
-        title: "9U Pitching Machine — Coach Operation",
-        badge: "TABA Home/Host Rule",
-        content: `
-          <div class="callout blue">
-            <p>The <strong>pitching machine is operated by coaches</strong>. There is no live pitching in TABA 9U. BC Minor pitch count and pitcher eligibility rules (<a href="#rule-24" class="bcm-link">Rule 24</a>) do not apply.</p>
-          </div>
-          <ul class="rl">
-            <li>The goal is to <strong>maximize opportunities for players to hit</strong> and develop fundamental batting skills.</li>
-            <li>Coaches operating the machine should aim to deliver consistent, hittable pitches suitable for the age group.</li>
-          </ul>
-          <p class="note">Confirm with TABA regarding the specific batter protocol (e.g., maximum pitches per at-bat) before publishing as binding.</p>`
-      },
-      {
-        id: "taba-9u-baserunning",
-        insertAfterRule: "26",
-        title: "9U Base Running",
-        badge: "TABA Home/Host Rule",
-        content: `
-          <div class="callout red">
-            <ul class="rl">
-              <li><strong>No advancing on overthrows.</strong> Runners may not advance on a ball thrown past a fielder or out of play.</li>
-              <li><strong>Runners stop advancing once the ball is returned to the infield.</strong> Once any infield fielder has control of the ball, all runners must stop at the nearest base.</li>
-            </ul>
-          </div>
-          <p class="note">These restrictions are designed to keep play safe and efficient at the developmental level.</p>`
-      }
-    ]
-  },
-
-  /* ═══════════════════════════════════════════════════════════
      11U — Mosquito (TABA Local)
      ═══════════════════════════════════════════════════════════ */
   "11u": {
@@ -147,23 +31,9 @@ window.TABADivisions = {
     badge: "11U Mosquito",
     color: "#0c413b",
     group: "taba",
-    description: "TABA Home/Host Rules · Spring & Summer 2026",
+    description: "Spring & Summer 2026 · TABA Local Rules",
 
     overrides: {
-
-      "22.07": {
-        type: "differs",
-        label: "11U Time Limits — All League Games",
-        bcMinorSummary: "The 2-hour no-new-inning rule applies to Provincial Championships only. No time limit is mandated for regular league play.",
-        tabaSummary: "TABA applies a 2-hour time limit to ALL regular league games.",
-        content: `
-          <ul class="rl">
-            <li>Game length is <strong>two (2) hours</strong> from the scheduled start time.</li>
-            <li>No new inning shall start later than <strong>1 hour 45 minutes</strong> after the actual game start time.</li>
-            <li>If the home team is at bat when the 2-hour mark passes, the inning should be completed if possible (Umpire's decision).</li>
-            <li>In the event of weather or darkness, <strong>four innings</strong> constitute a complete game.</li>
-          </ul>`
-      },
 
       "26.08": {
         type: "differs",
@@ -174,28 +44,12 @@ window.TABADivisions = {
           <table>
             <thead><tr><th>Innings</th><th>Run Limit (TABA 11U)</th><th>Out Limit</th></tr></thead>
             <tbody>
-              <tr><td class="hi">1–2</td><td>2 runs maximum <span class="sb-badge badge-taba">TABA Home/Host Rule</span></td><td>3 outs</td></tr>
+              <tr><td class="hi">1–2</td><td>2 runs maximum <span class="sb-badge badge-taba">TABA only</span></td><td>3 outs</td></tr>
               <tr><td class="hi">3–5</td><td>4 runs maximum</td><td>3 outs</td></tr>
               <tr><td class="hi">6 (or last)</td><td>Open — no run limit</td><td>3 outs only</td></tr>
             </tbody>
           </table>
           <p class="note">The last inning is declared open by the umpire. The mercy rule may still end any half-inning.</p>`
-      },
-
-      "25.01": {
-        type: "differs",
-        label: "11U Fair Play — Infield/Outfield Position Limits",
-        bcMinorSummary: "No player may sit out 2 consecutive innings. General minimum participation — no specific infield/outfield inning counts.",
-        tabaSummary: "TABA specifies detailed position rotation: max 4 innings infield (only 1 position twice), pitcher & catcher max 3 innings each (only 2 count toward infield), max 3 innings outfield.",
-        content: `
-          <ul class="rl">
-            <li>Players may play a maximum of <strong>four (4) innings infield</strong>, of which only <strong>one position may be played twice</strong>.</li>
-            <li><strong>Pitcher and catcher</strong> may each occupy their position for a maximum of <strong>three (3) innings</strong>. Only two (2) of those innings count toward infield time.</li>
-            <li>Players may play a maximum of <strong>three (3) innings per game in the outfield</strong>. All outfield positions are considered the same position.</li>
-          </ul>
-          <div class="callout navy">
-            <p><strong>Example:</strong> If a player plays 3 innings at catcher, only 2 count toward their infield total — they can still play 1 inning at 1st base and 1 inning at 3rd base.</p>
-          </div>`
       },
 
       "26.14": {
@@ -207,76 +61,36 @@ window.TABADivisions = {
 
     additions: [
       {
-        id: "taba-11u-precedence",
-        insertAfterRule: "1",
-        title: "11U Rule Scope & Precedence",
-        badge: "TABA Home/Host Rule",
-        content: `
-          <div class="callout blue">
-            <p><strong>These rules apply when TABA is the home association or tournament host.</strong> For away games, check the host association's published local rules first.</p>
-          </div>
-          <div class="callout navy">
-            <p><strong>Order of Precedence for 11U games (highest to lowest):</strong></p>
-            <ol class="nl">
-              <li><strong>Home/Host Association Local Rules</strong> — TABA rules apply at Tsawwassen fields or TABA-hosted tournaments. At away games, the host association's published local rules apply.</li>
-              <li><strong>Fraser Delta Interlock Rules</strong> — if the host association has no published local rule for the situation.</li>
-              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — if Interlock is silent.</li>
-              <li><strong>Official Rules of Baseball</strong> — if BC Minor is silent.</li>
-            </ol>
-          </div>`
-      },
-      {
         id: "taba-11u-first-year-pitcher",
         insertAfterRule: "24",
         title: "First-Year Pitcher Rule",
-        badge: "Fraser Delta Interlock",
+        badge: "TABA 11U Only",
         content: `
           <div class="callout blue">
-            <p>The <strong>first two innings of each game must be pitched by a first-year or under-aged player</strong>.</p>
+            <p>The <strong>first two innings of each game must be pitched by a first-year player</strong> — defined as a player who did not play in the 11U Division in a previous year, and who is eligible to play one more year in 11U.</p>
           </div>
-          <p><strong>Definitions:</strong></p>
-          <ul class="rl">
-            <li><strong>Under-aged player:</strong> a player at the maximum age for the 9U division.</li>
-            <li><strong>First-year 11U player:</strong> a player at the minimum age for the 11U division (did not play 11U in a previous year).</li>
-            <li><strong>Second-year 11U player:</strong> a player at the maximum age for the 11U division.</li>
-          </ul>
-          <p>Any eligible player may pitch from inning 3 onward, subject to pitch count rules.</p>
-          <p class="note">A second-year 11U player may not pitch until inning three or later.</p>`
+          <p>A second-year player may not pitch until inning three or later.</p>
+          <p class="note">This rule has no equivalent in BC Minor Baseball. It is a TABA-specific development rule designed to give first-year players pitching experience.</p>`
       },
       {
         id: "taba-11u-stealing-home",
         insertAfterRule: "26",
-        title: "11U Base Running — Stealing Home",
-        badge: "Fraser Delta Interlock",
+        title: "11U Base Running — No Stealing Home (Innings 1–2)",
+        badge: "TABA 11U Only",
         content: `
-          <div class="callout navy">
-            <p><strong>Date-based rule — applies all season:</strong></p>
-            <ul class="rl">
-              <li><strong>Until May 1:</strong> runners may not steal home in innings 1 and 2.</li>
-              <li><strong>Starting May 1:</strong> runners may steal home in any inning, subject to normal leadoff and base-running rules.</li>
-            </ul>
-          </div>
-          <p>Before May 1, the only ways a runner may score in innings 1 and 2 are being forced home (walk, hit batter, or catcher interference) or the continuation of a play that began with a hit ball.</p>
-          <p>From inning 3 onward (any date), stealing home is permitted subject to all other base running rules including the <a href="#26-09" class="bcm-link">leadoff rule (BC Minor 26.09)</a>.</p>`
-      },
-      {
-        id: "taba-11u-game-length",
-        insertAfterRule: "22",
-        title: "11U Game Length & Time Limits",
-        badge: "TABA Home/Host Rule",
-        content: `
+          <div class="callout red"><p><strong>No stealing of home is allowed in the first two (2) innings.</strong></p></div>
+          <p>The only two ways a player can score in innings 1 and 2:</p>
           <ul class="rl">
-            <li>Game length is <strong>two (2) hours</strong> from the scheduled start time.</li>
-            <li>No new inning shall start later than <strong>1 hour 45 minutes</strong> after the actual game start time.</li>
-            <li>If another game is scheduled afterward, or if the umpire deems it too dark to play safely, the game may be called — score reverts to the last completed inning.</li>
-            <li>In the event of weather or darkness, <strong>four innings</strong> constitute a complete game.</li>
-          </ul>`
+            <li>Being forced home by a walk, hit batter, or catcher interference.</li>
+            <li>The continuation of a play that began with a hit ball.</li>
+          </ul>
+          <p>From inning 3 onward, stealing home is permitted subject to all other base running rules including the <a href="#26-09" class="bcm-link">leadoff rule (BC Minor 26.09)</a>.</p>`
       },
       {
         id: "taba-11u-coaches",
         insertAfterRule: "10",
         title: "11U Coaches — On-Field Rules",
-        badge: "TABA Home/Host Rule",
+        badge: "TABA 11U Only",
         content: `
           <ul class="rl">
             <li>Maximum <strong>three (3) coaches</strong> inside the fenced perimeter during game play.</li>
@@ -289,21 +103,19 @@ window.TABADivisions = {
         id: "taba-11u-home-team",
         insertAfterRule: "22",
         title: "11U Home Team Responsibilities",
-        badge: "TABA Home/Host Rule",
+        badge: "TABA 11U Only",
         content: `
           <ul class="rl">
-            <li>Home team occupies the <strong>dugout behind third base</strong>.</li>
-            <li>Bring <strong>two new game balls</strong> to the umpire at the start of each game.</li>
-            <li>Home team's scorekeeper is the <strong>official scorekeeper</strong>.</li>
             <li>Notify the umpire allocator, concession manager, and 11U Division Manager of any game cancellations, postponements, or rescheduling.</li>
             <li>Prepare the diamond: line the field and fill depressions before the game. After the game, return all equipment to bins and lock up.</li>
+            <li>Bring <strong>two provided game balls</strong> to the umpire at the start of each game.</li>
           </ul>`
       },
       {
         id: "taba-11u-9u-callup",
         insertAfterRule: "5",
         title: "11U — Use of 9U (Tadpole) Players",
-        badge: "TABA Home/Host Rule",
+        badge: "TABA 11U Only",
         content: `
           <div class="callout red">
             <p><a href="#5-06" class="bcm-link">BC Minor Rule 5.06</a> limits 9U call-ups to <strong>5 regular season games plus one tournament</strong> per player per season.</p>
@@ -342,16 +154,17 @@ window.TABADivisions = {
         type: "differs",
         label: "13U A Interlock — Graduated Balk Rules",
         bcMinorSummary: "Balks are called at 13U and higher as per general baseball rules.",
-        tabaSummary: "Interlock uses a graduated warning system: blanket warning in April, one warning per pitcher in May, called without warning from June.",
+        tabaSummary: "Interlock uses a graduated warning system by month. In all cases, warnings are per pitcher — not per game.",
         content: `
           <table>
             <thead><tr><th>Month</th><th>Balk Rule (13U A)</th></tr></thead>
             <tbody>
-              <tr><td class="hi">April</td><td>One blanket warning for the entire game — no individual balk calls</td></tr>
-              <tr><td class="hi">May</td><td>One warning per pitcher — second balk by same pitcher is called</td></tr>
-              <tr><td class="hi">June</td><td>Balks called without warning per standard baseball rules</td></tr>
+              <tr><td class="hi">April</td><td>One warning per pitcher — second balk by the same pitcher is called</td></tr>
+              <tr><td class="hi">May</td><td>One warning per pitcher — second balk by the same pitcher is called</td></tr>
+              <tr><td class="hi">June</td><td>Balks called immediately — no warnings per standard baseball rules</td></tr>
             </tbody>
-          </table>`
+          </table>
+          <p class="note">Warnings are always <strong>per pitcher</strong>, not per game. A new pitcher entering the game starts fresh with no warning count.</p>`
       },
 
       "26.08": {
@@ -400,18 +213,14 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "13U A Interlock",
         content: `
-          <div class="callout blue">
-            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local/home rule for the situation.</p>
-          </div>
-          <div class="callout navy">
-            <p><strong>Order of Precedence for Fraser Delta Interlock games (highest to lowest):</strong></p>
+          <div class="callout red">
+            <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li><strong>Host/Home Association Local Rules</strong> — the host association's published local rules apply first. For TABA home games, TABA local rules apply.</li>
-              <li><strong>Fraser Delta Interlock Rules</strong> — if the host association has no published local rule for the situation.</li>
-              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — if Interlock rules are silent.</li>
-              <li><strong>Official Rules of Baseball</strong> — if BC Minor rules are silent.</li>
+              <li>Fraser Delta Interlock Rules</li>
+              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
+              <li>Official Rules of Baseball</li>
             </ol>
-            <p>Where Interlock rules are silent, BC Minor rules apply. Where BC Minor rules are silent, the Official Rules of Baseball apply.</p>
+            <p>Where the Interlock Rules are silent, BC Minor rules apply. Where BC Minor rules are silent, the Official Rules of Baseball apply.</p>
           </div>
           <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
@@ -477,7 +286,8 @@ window.TABADivisions = {
         title: "13U A — Umpires",
         badge: "13U A Interlock",
         content: `
-          <p>The <strong>home team is responsible for supplying umpires</strong> for all interlock games. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
+          <p>The <strong>home team is responsible for supplying umpires</strong> for all interlock games. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> for general umpire conduct and authority.</p>
+          <p>Acceptable behavior for interacting with umpires is defined in <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
       },
       {
         id: "fdi-13ua-playoffs",
@@ -559,11 +369,11 @@ window.TABADivisions = {
           <table>
             <thead><tr><th>Month</th><th>Balk Rule (13U AA)</th></tr></thead>
             <tbody>
-              <tr><td class="hi">April</td><td>One warning per pitcher — second balk by same pitcher is called</td></tr>
-              <tr><td class="hi">May & June</td><td>Balks called immediately — no warnings</td></tr>
+              <tr><td class="hi">April</td><td>One warning per pitcher — second balk by the same pitcher is called</td></tr>
+              <tr><td class="hi">May & June</td><td>Balks called immediately — no warnings per standard baseball rules</td></tr>
             </tbody>
           </table>
-          <p class="note">13U AA uses a stricter balk schedule than 13U A, reflecting the higher level of play.</p>`
+          <p class="note">Warnings are always <strong>per pitcher</strong>, not per game. 13U AA uses a stricter balk schedule than 13U A, reflecting the higher level of play.</p>`
       },
 
       "26.08": {
@@ -614,28 +424,21 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "13U AA Interlock",
         content: `
-          <div class="callout blue">
-            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local/home rule for the situation.</p>
-          </div>
-          <div class="callout navy">
-            <p><strong>Order of Precedence for Fraser Delta Interlock games (highest to lowest):</strong></p>
+          <div class="callout red">
+            <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li><strong>Host/Home Association Local Rules</strong> — the host association's published local rules apply first. For TABA home games, TABA local rules apply.</li>
-              <li><strong>Fraser Delta Interlock Rules</strong> — if the host association has no published local rule for the situation.</li>
-              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — if Interlock rules are silent.</li>
-              <li><strong>Official Rules of Baseball</strong> — if BC Minor rules are silent.</li>
+              <li>Fraser Delta Interlock Rules</li>
+              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
+              <li>Official Rules of Baseball</li>
             </ol>
-            <p>Where Interlock rules are silent, BC Minor rules apply. Where BC Minor rules are silent, the Official Rules of Baseball apply.</p>
           </div>
-          <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
             <thead><tr><th>Contact</th><th>Role</th><th>Email</th></tr></thead>
             <tbody>
-              <tr><td>Steve Ormston</td><td>Website Coordinator (scores/standings)</td><td>scheduler@ndbaseball.com</td></tr>
+              <tr><td>Steve Ormston</td><td>Website Coordinator</td><td>scheduler@ndbaseball.com</td></tr>
               <tr><td>Brent Dingsdale</td><td>Interlock Coordinator</td><td>coaching@ndbaseball.com</td></tr>
             </tbody>
-          </table>
-          <p>Schedule and standings are hosted at <strong>ndbaseball.com</strong> (SportsEngine).</p>`
+          </table>`
       },
       {
         id: "fdi-13uaa-schedule",
@@ -699,7 +502,7 @@ window.TABADivisions = {
         insertAfterRule: "17",
         title: "13U AA — Umpires",
         badge: "13U AA Interlock",
-        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
+        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> for general umpire authority. Acceptable behavior for interacting with umpires is defined in <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
       },
       {
         id: "fdi-13uaa-playoffs",
@@ -800,28 +603,21 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "15U A Interlock",
         content: `
-          <div class="callout blue">
-            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local/home rule for the situation.</p>
-          </div>
-          <div class="callout navy">
-            <p><strong>Order of Precedence for Fraser Delta Interlock games (highest to lowest):</strong></p>
+          <div class="callout red">
+            <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li><strong>Host/Home Association Local Rules</strong> — the host association's published local rules apply first. For TABA home games, TABA local rules apply.</li>
-              <li><strong>Fraser Delta Interlock Rules</strong> — if the host association has no published local rule for the situation.</li>
-              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — if Interlock rules are silent.</li>
-              <li><strong>Official Rules of Baseball</strong> — if BC Minor rules are silent.</li>
+              <li>Fraser Delta Interlock Rules</li>
+              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
+              <li>Official Rules of Baseball</li>
             </ol>
-            <p>Where Interlock rules are silent, BC Minor rules apply. Where BC Minor rules are silent, the Official Rules of Baseball apply.</p>
           </div>
-          <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
             <thead><tr><th>Contact</th><th>Role</th><th>Email</th></tr></thead>
             <tbody>
-              <tr><td>Steve Ormston</td><td>Website Coordinator (scores/standings)</td><td>scheduler@ndbaseball.com</td></tr>
+              <tr><td>Steve Ormston</td><td>Website Coordinator</td><td>scheduler@ndbaseball.com</td></tr>
               <tr><td>Brent Dingsdale</td><td>Interlock Coordinator</td><td>coaching@ndbaseball.com</td></tr>
             </tbody>
-          </table>
-          <p>Schedule and standings are hosted at <strong>ndbaseball.com</strong> (SportsEngine).</p>`
+          </table>`
       },
       {
         id: "fdi-15ua-schedule",
@@ -871,7 +667,7 @@ window.TABADivisions = {
         insertAfterRule: "17",
         title: "15U A — Umpires",
         badge: "15U A Interlock",
-        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
+        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> and <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
       },
       {
         id: "fdi-15ua-playoffs",
@@ -988,28 +784,21 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "18U AA Interlock",
         content: `
-          <div class="callout blue">
-            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local/home rule for the situation.</p>
-          </div>
-          <div class="callout navy">
-            <p><strong>Order of Precedence for Fraser Delta Interlock games (highest to lowest):</strong></p>
+          <div class="callout red">
+            <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li><strong>Host/Home Association Local Rules</strong> — the host association's published local rules apply first. For TABA home games, TABA local rules apply.</li>
-              <li><strong>Fraser Delta Interlock Rules</strong> — if the host association has no published local rule for the situation.</li>
-              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — if Interlock rules are silent.</li>
-              <li><strong>Official Rules of Baseball</strong> — if BC Minor rules are silent.</li>
+              <li>Fraser Delta Interlock Rules</li>
+              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
+              <li>Official Rules of Baseball</li>
             </ol>
-            <p>Where Interlock rules are silent, BC Minor rules apply. Where BC Minor rules are silent, the Official Rules of Baseball apply.</p>
           </div>
-          <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
             <thead><tr><th>Contact</th><th>Role</th><th>Email</th></tr></thead>
             <tbody>
-              <tr><td>Steve Ormston</td><td>Website Coordinator (scores/standings)</td><td>scheduler@ndbaseball.com</td></tr>
+              <tr><td>Steve Ormston</td><td>Website Coordinator</td><td>scheduler@ndbaseball.com</td></tr>
               <tr><td>Brent Dingsdale</td><td>Interlock Coordinator</td><td>coaching@ndbaseball.com</td></tr>
             </tbody>
-          </table>
-          <p>Schedule and standings are hosted at <strong>ndbaseball.com</strong> (SportsEngine).</p>`
+          </table>`
       },
       {
         id: "fdi-18uaa-schedule",
@@ -1070,7 +859,7 @@ window.TABADivisions = {
         insertAfterRule: "17",
         title: "18U AA — Umpires",
         badge: "18U AA Interlock",
-        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
+        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> and <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
       },
       {
         id: "fdi-18uaa-playoffs",
@@ -1101,6 +890,120 @@ window.TABADivisions = {
         title: "18U AA — Fair Play Rules",
         badge: "18U AA Interlock",
         content: `<p>Fair play rules follow <a href="#rule-25" class="bcm-link">BC Minor Rule 25: Fair Play Rule</a> in full.</p>`
+      }
+    ]
+  }
+
+,
+  /* ═══════════════════════════════════════════════════════════
+     9U — Tadpole (TABA Local)
+     ═══════════════════════════════════════════════════════════ */
+  "9u": {
+    name: "9U — Tadpole",
+    badge: "9U Tadpole",
+    color: "#1e6b3a",
+    group: "taba",
+    description: "Spring 2026 · TABA Local Rules",
+
+    overrides: {
+
+      "31.03": {
+        type: "differs",
+        label: "9U TABA — Pitching Structure (Two Phases)",
+        bcMinorSummary: "BC Minor Rule 31.03 allows player pitching from 42 or 46 feet, one inning per player, max 35 pitches. All players may only pitch 1 inning per game.",
+        tabaSummary: "TABA uses a two-phase pitching structure split at the May long weekend. Before the May long weekend, coach/slinger pitches first 3; after, second-year players pitch first 3. In both phases, coach pitches the final 3. If the batter does not get a hit and a third strike is recorded, the batter is out.",
+        content: `
+          <div class="callout red">
+            <p><strong>TABA 9U pitching has two phases separated by the May long weekend.</strong> The structure ensures all batters get a fair chance to put the ball in play while introducing player pitching progressively through the season.</p>
+          </div>
+
+          <div class="sub-rule">
+            <div class="sub-rule-title">Phase 1 — Before May Long Weekend</div>
+            <table>
+              <thead><tr><th>Pitches</th><th>Who Pitches</th><th>If No Hit After 3 Pitches</th></tr></thead>
+              <tbody>
+                <tr><td class="hi">Pitches 1–3</td><td>The slinger (coach or designated helper)</td><td rowspan="2" style="vertical-align:middle;">If the batter has not made contact and pitch 6 is a third strike — <strong>batter is out</strong></td></tr>
+                <tr><td class="hi">Pitches 4–6</td><td>Coach</td></tr>
+              </tbody>
+            </table>
+            <p class="note">The slinger pitches from the standard 9U pitching distance. The batter gets up to 6 pitches total to put the ball in play.</p>
+          </div>
+
+          <div class="sub-rule">
+            <div class="sub-rule-title">Phase 2 — After May Long Weekend</div>
+            <table>
+              <thead><tr><th>Pitches</th><th>Who Pitches</th><th>If No Hit After 3 Pitches</th></tr></thead>
+              <tbody>
+                <tr><td class="hi">Pitches 1–3</td><td>A <strong>second-year TABA player</strong> (player who played 9U the previous year)</td><td rowspan="2" style="vertical-align:middle;">If the batter has not made contact and pitch 6 is a third strike — <strong>batter is out</strong></td></tr>
+                <tr><td class="hi">Pitches 4–6</td><td>Coach</td></tr>
+              </tbody>
+            </table>
+            <p class="note">Second-year players pitch from the standard 9U pitching distance. First-year players do not pitch in Phase 2 — this is a development opportunity for returning players. <a href="#31-03" class="bcm-link">BC Minor Rule 31.03</a> pitch count and inning limits still apply to player pitching in Phase 2.</p>
+          </div>
+
+          <div class="callout navy">
+            <p><strong>Rule summary for both phases:</strong></p>
+            <ul class="rl">
+              <li>Batter receives up to <strong>6 pitches total</strong> (3 from pitcher/slinger, then 3 from coach).</li>
+              <li>If the batter makes contact at any point, normal play resumes.</li>
+              <li>If the batter does not make contact and a <strong>third strike is recorded on pitch 6 (or earlier)</strong>, the batter is out.</li>
+              <li>Foul balls on pitch 6 are not an out — the batter continues until a fair contact, a swing-and-miss third strike, or a called third strike.</li>
+            </ul>
+          </div>`
+      }
+    },
+
+    additions: [
+      {
+        id: "taba-9u-pitching-overview",
+        insertAfterRule: "31",
+        title: "9U TABA — Pitching Structure Overview",
+        badge: "TABA 9U Only",
+        content: `
+          <div class="callout blue">
+            <p>TABA 9U uses a <strong>two-phase pitching structure</strong> through the season, designed to develop batting confidence early and introduce player pitching progressively.</p>
+          </div>
+
+          <div class="sub-rule">
+            <div class="sub-rule-title">Phase 1 — Before May Long Weekend</div>
+            <ul class="rl">
+              <li>The <strong>slinger</strong> (a coach or designated helper) delivers the first <strong>3 pitches</strong>.</li>
+              <li>If the batter has not made contact after 3 pitches, the <strong>coach</strong> delivers the next <strong>3 pitches</strong>.</li>
+              <li>If the batter still has not made contact after all 6 pitches and a third strike is recorded — the <strong>batter is out</strong>.</li>
+            </ul>
+          </div>
+
+          <div class="sub-rule">
+            <div class="sub-rule-title">Phase 2 — After May Long Weekend</div>
+            <ul class="rl">
+              <li>A <strong>second-year TABA player</strong> (a player who played 9U the previous year) delivers the first <strong>3 pitches</strong>.</li>
+              <li>If the batter has not made contact after 3 pitches, the <strong>coach</strong> delivers the next <strong>3 pitches</strong>.</li>
+              <li>If the batter still has not made contact after all 6 pitches and a third strike is recorded — the <strong>batter is out</strong>.</li>
+              <li>First-year players do not pitch in Phase 2.</li>
+            </ul>
+          </div>
+
+          <div class="callout">
+            <p><strong>In both phases:</strong> If the batter makes contact at any point, normal play resumes per <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a>. Pitch count and inning limits from <a href="#31-03" class="bcm-link">Rule 31.03</a> apply to all player pitching in Phase 2.</p>
+          </div>
+
+          <p class="note">This rule has no equivalent in BC Minor Baseball Rule 31. It is a TABA-specific developmental rule. BC Minor Rule 31 governs all other aspects of 9U play.</p>`
+      },
+      {
+        id: "taba-9u-bcminor-note",
+        insertAfterRule: "1",
+        title: "9U — Governing Rules Overview",
+        badge: "TABA 9U Only",
+        content: `
+          <div class="callout red">
+            <p><strong>Order of Precedence (highest to lowest):</strong></p>
+            <ol class="nl">
+              <li>TABA 9U Local Rules (this section)</li>
+              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a> — in particular <a href="#rule-31" class="bcm-link">Rule 31: 9U Specific Rules</a></li>
+              <li>Official Rules of Baseball</li>
+            </ol>
+          </div>
+          <p>All aspects of <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> apply to TABA 9U play unless specifically modified by a TABA local rule shown in this section. The primary TABA modification is the two-phase pitching structure — all other 9U rules follow BC Minor Rule 31 exactly.</p>`
       }
     ]
   }
