@@ -241,6 +241,15 @@
     .audit-link:hover { text-decoration: underline; }
 
     .empty-msg { color: #888; font-size: .86rem; text-align: center; padding: 2.5rem 1rem; }
+
+    /* ── Amendment ref ──────────────────────────── */
+    .amendment-ref {
+      font-size: .72rem; color: #888; padding: .5rem .7rem;
+      background: #f8f9fc; border-radius: 5px; margin-bottom: .9rem;
+      border-left: 3px solid #2ecc71;
+    }
+    .amendment-ref a { color: #1a5276; text-decoration: none; font-weight: 600; }
+    .amendment-ref a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -442,9 +451,14 @@ function buildAdditionCard(divKey, addition) {
   const sid  = addition.id;
   const type = 'additions';
   const isAmended = amended(divKey, type, sid);
+  const meta = amendments?.[divKey]?.[type]?.[sid]?._meta;
 
   const badge   = effectiveVal(divKey, type, sid, 'badge',   addition.badge   || '');
   const content = effectiveVal(divKey, type, sid, 'content', addition.content || '');
+
+  const metaBlock = meta ? `<div class="amendment-ref">
+    Last amended ${fmtDate(meta.updated)} · <a href="${escA(meta.url)}" target="_blank" rel="noopener">View change on GitHub ↗</a>
+  </div>` : '';
 
   return `
     <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
@@ -454,6 +468,7 @@ function buildAdditionCard(divKey, addition) {
         ${isAmended ? '<span class="amended-tag">AMENDED</span>' : ''}
       </summary>
       <div class="card-body">
+        ${metaBlock}
         ${fieldText(cid, 'badge', 'Badge label', badge, 'Short label shown in the rule header.')}
         ${fieldContent(cid, 'content', content)}
         ${actions(cid, divKey, type, sid, 'badge,content', isAmended)}
@@ -466,11 +481,16 @@ function buildOverrideCard(divKey, ruleId, ov) {
   const cid  = 'c' + (++cardSeq);
   const type = 'overrides';
   const isAmended = amended(divKey, type, ruleId);
+  const meta = amendments?.[divKey]?.[type]?.[ruleId]?._meta;
 
   const label      = effectiveVal(divKey, type, ruleId, 'label',         ov.label         || ruleId);
   const bcMinorSum = effectiveVal(divKey, type, ruleId, 'bcMinorSummary', ov.bcMinorSummary || '');
   const tabaSum    = effectiveVal(divKey, type, ruleId, 'tabaSummary',   ov.tabaSummary   || '');
   const content    = effectiveVal(divKey, type, ruleId, 'content',       ov.content       || '');
+
+  const metaBlock = meta ? `<div class="amendment-ref">
+    Last amended ${fmtDate(meta.updated)} · <a href="${escA(meta.url)}" target="_blank" rel="noopener">View change on GitHub ↗</a>
+  </div>` : '';
 
   return `
     <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
@@ -480,6 +500,7 @@ function buildOverrideCard(divKey, ruleId, ov) {
         ${isAmended ? '<span class="amended-tag">AMENDED</span>' : ''}
       </summary>
       <div class="card-body">
+        ${metaBlock}
         ${fieldText(cid, 'label', 'Override panel label', label, '')}
         ${fieldTextarea(cid, 'bcMinorSummary', 'BC Minor Summary (left column)', bcMinorSum)}
         ${fieldTextarea(cid, 'tabaSummary',    'TABA Summary (right column header)', tabaSum)}
@@ -709,6 +730,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escA(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function escT(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 </script>
 </body>
 </html>

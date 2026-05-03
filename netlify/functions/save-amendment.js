@@ -81,11 +81,29 @@ exports.handler = async (event, context) => {
   const changedFields = Object.keys(sanitized).join(', ');
   const message = `CMS: ${divisionKey}/${sectionId} — update ${changedFields} [admin]`;
 
-  await octokit.rest.repos.createOrUpdateFileContents({
+  // Write 1: the content change
+  const { data: write1 } = await octokit.rest.repos.createOrUpdateFileContents({
     owner: OWNER, repo: REPO, path: PATH, branch: BRANCH,
     message,
     content: Buffer.from(JSON.stringify(current, null, 2) + '\n').toString('base64'),
     ...(sha ? { sha } : {}),
+  });
+
+  // Write 2: store metadata pointing back to the content-change commit
+  const amendUrl = `https://github.com/${OWNER}/${REPO}/commit/${write1.commit.sha}`;
+  const updated  = write1.commit.author.date;
+
+  const { data: fileState } = await octokit.rest.repos.getContent({
+    owner: OWNER, repo: REPO, path: PATH, ref: BRANCH,
+  });
+
+  current[divisionKey][sectionType][sectionId]._meta = { updated, url: amendUrl, author: 'admin' };
+
+  await octokit.rest.repos.createOrUpdateFileContents({
+    owner: OWNER, repo: REPO, path: PATH, branch: BRANCH,
+    message: `CMS: meta — ${divisionKey}/${sectionId} [admin]`,
+    content: Buffer.from(JSON.stringify(current, null, 2) + '\n').toString('base64'),
+    sha: fileState.sha,
   });
 
   return {

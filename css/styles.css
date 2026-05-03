@@ -536,6 +536,13 @@ ol.nl > li::before { content: counter(nl)"."; position: absolute; left: 0; font-
 .badge-taba { background: #dceeff; color: #1a4a8a; border: 1px solid #a8cbf0; }
 .badge-bcm  { background: #ffe8e8; color: #8b0000; border: 1px solid #f0a0a0; }
 
+.amendment-attr {
+  font-size: .72rem; color: var(--muted); margin-top: .75rem;
+  padding-top: .5rem; border-top: 1px dashed var(--rule-bdr); line-height: 1.4;
+}
+.amendment-attr a { color: var(--gold); text-decoration: none; }
+.amendment-attr a:hover { text-decoration: underline; }
+
 /* ── Footer ── */
 .attr-bar {
   background: #0d1a2e; margin: 3rem -2.5rem 0;

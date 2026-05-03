@@ -31,14 +31,16 @@ exports.handler = async (event, context) => {
     owner: OWNER, repo: REPO, path: PATH, per_page: 50,
   });
 
-  const log = commits.map(c => ({
-    sha:     c.sha.slice(0, 7),
-    message: c.commit.message,
-    author:  c.commit.author.name,
-    email:   c.commit.author.email,
-    date:    c.commit.author.date,
-    url:     c.html_url,
-  }));
+  const log = commits
+    .filter(c => !c.commit.message.startsWith('CMS: meta'))
+    .map(c => ({
+      sha:     c.sha.slice(0, 7),
+      message: c.commit.message,
+      author:  c.commit.author.name,
+      email:   c.commit.author.email,
+      date:    c.commit.author.date,
+      url:     c.html_url,
+    }));
 
   return {
     statusCode: 200,

@@ -355,8 +355,19 @@ window.Rulebook = (() => {
           <span class="dp-label">${icon} ${label}</span>
           <span class="dp-chev">▼</span>
         </div>
-        <div class="division-panel-body">${body}</div>
+        <div class="division-panel-body">${body}${buildAmendmentAttr(override._meta)}</div>
       </div>`;
+  }
+
+  function buildAmendmentAttr(meta) {
+    if (!meta || !meta.updated) return '';
+    const date = new Date(meta.updated).toLocaleDateString('en-CA', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+    const link = meta.url
+      ? ` · <a href="${meta.url}" target="_blank" rel="noopener" class="amendment-link">View change ↗</a>`
+      : '';
+    return `<div class="amendment-attr">Amended ${date}${link}</div>`;
   }
 
   function buildAddition(addition) {
@@ -367,7 +378,7 @@ window.Rulebook = (() => {
           <span class="taba-rule-title">${addition.title}</span>
           <span class="taba-rule-chev">▼</span>
         </button>
-        <div class="taba-rule-body">${addition.content || ''}</div>
+        <div class="taba-rule-body">${addition.content || ''}${buildAmendmentAttr(addition._meta)}</div>
       </div>`;
   }
 
