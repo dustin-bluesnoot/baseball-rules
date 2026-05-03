@@ -14,12 +14,12 @@ window.Rulebook = (() => {
   // ─── Entry point ─────────────────────────────────────────
   async function init(divisionParam) {
     try {
-      const resp = await fetch('/amendments.json');
+      const resp = await fetch('/api/amendments');
       if (resp.ok) {
         const amendments = await resp.json();
         if (amendments && typeof amendments === 'object') applyAmendments(amendments);
       }
-    } catch (e) { /* proceed with base data if amendments.json is unavailable */ }
+    } catch (e) { /* proceed with base data if KV is unavailable */ }
 
     const key = divisionParam ? divisionParam.toLowerCase() : null;
     if (key && window.TABADivisions[key]) {
@@ -355,8 +355,16 @@ window.Rulebook = (() => {
           <span class="dp-label">${icon} ${label}</span>
           <span class="dp-chev">▼</span>
         </div>
-        <div class="division-panel-body">${body}</div>
+        <div class="division-panel-body">${body}${buildAmendmentAttr(override._meta)}</div>
       </div>`;
+  }
+
+  function buildAmendmentAttr(meta) {
+    if (!meta || !meta.updated) return '';
+    const date = new Date(meta.updated).toLocaleDateString('en-CA', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+    return `<div class="amendment-attr">Amended ${date}</div>`;
   }
 
   function buildAddition(addition) {
@@ -367,7 +375,7 @@ window.Rulebook = (() => {
           <span class="taba-rule-title">${addition.title}</span>
           <span class="taba-rule-chev">▼</span>
         </button>
-        <div class="taba-rule-body">${addition.content || ''}</div>
+        <div class="taba-rule-body">${addition.content || ''}${buildAmendmentAttr(addition._meta)}</div>
       </div>`;
   }
 

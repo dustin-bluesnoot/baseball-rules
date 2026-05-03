@@ -2,8 +2,8 @@
   "name": "baseball-rules",
   "private": true,
   "version": "1.0.0",
-  "description": "TABA Rulebook — Netlify Functions dependencies",
+  "description": "TABA Rulebook — Vercel API dependencies",
   "dependencies": {
-    "@octokit/rest": "^20.0.0"
+    "@vercel/kv": "^3.0.0"
   }
 }

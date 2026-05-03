@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TABA Rule Editor — Admin</title>
-  <!-- Netlify Identity widget (handles login/logout UI and JWT management) -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <!-- Load base division data so the editor can show current values -->
   <script src="../js/taba-divisions.js"></script>
   <style>
@@ -29,12 +27,26 @@
     .login-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .login-box h1 { font-size: 1.25rem; font-weight: 700; margin-bottom: .4rem; }
     .login-box p  { color: #666; font-size: .85rem; margin-bottom: 1.5rem; line-height: 1.5; }
+    #login-password {
+      width: 100%; border: 1px solid #c9d0df; border-radius: 6px;
+      padding: .55rem .75rem; font-size: .9rem; color: #1a1a2e;
+      margin-bottom: .75rem; background: #fafbfd;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    #login-password:focus {
+      outline: none; border-color: #0d2240;
+      box-shadow: 0 0 0 3px rgba(13,34,64,.1);
+    }
     #login-btn {
       background: #0d2240; color: #fff; border: none; border-radius: 6px;
       padding: .65rem 1.75rem; font-size: .9rem; font-weight: 600;
       cursor: pointer; transition: background .15s; width: 100%;
     }
-    #login-btn:hover { background: #163462; }
+    #login-btn:hover:not(:disabled) { background: #163462; }
+    #login-btn:disabled { opacity: .55; cursor: default; }
+    #login-error {
+      margin-top: .75rem; color: #c0392b; font-size: .8rem; font-weight: 600;
+    }
 
     /* ── App shell ──────────────────────────────── */
     #admin-app { display: flex; flex-direction: column; min-height: 100vh; }
@@ -52,8 +64,6 @@
       font-size: .68rem; color: rgba(255,255,255,.45);
       font-weight: 400; margin-left: .5rem;
     }
-    .header-right { display: flex; align-items: center; gap: .75rem; }
-    #user-email { font-size: .75rem; color: rgba(255,255,255,.6); }
     #logout-btn {
       background: rgba(255,255,255,.12); color: #fff;
       border: 1px solid rgba(255,255,255,.25); border-radius: 4px;
@@ -231,6 +241,51 @@
     .audit-link:hover { text-decoration: underline; }
 
     .empty-msg { color: #888; font-size: .86rem; text-align: center; padding: 2.5rem 1rem; }
+
+    /* ── Amendment ref ──────────────────────────── */
+    .amendment-ref {
+      font-size: .72rem; color: #555; padding: .45rem .7rem;
+      background: #f0fff4; border-radius: 5px; margin-bottom: .9rem;
+      border-left: 3px solid #2ecc71;
+    }
+
+    /* ── Audit log ──────────────────────────────── */
+    .audit-header {
+      display: flex; align-items: center; gap: .55rem; flex-wrap: wrap;
+    }
+    .audit-action {
+      font-size: .62rem; font-weight: 700; padding: .1rem .38rem;
+      border-radius: 3px; letter-spacing: .04em; flex-shrink: 0;
+    }
+    .audit-action.update { background: #dceeff; color: #1a4a8a; }
+    .audit-action.revert { background: #ffe8e8; color: #8b0000; }
+    .audit-section { font-size: .82rem; font-weight: 600; flex: 1; min-width: 0; }
+    .audit-date { font-size: .72rem; color: #888; white-space: nowrap; }
+    .audit-diff { margin-top: .45rem; }
+    .audit-diff > summary {
+      font-size: .75rem; color: #555; cursor: pointer;
+      padding: .15rem 0; list-style: none; display: inline-block;
+    }
+    .audit-diff > summary::before { content: '▶ '; font-size: .5rem; }
+    .audit-diff[open] > summary::before { content: '▼ '; }
+    .diff-field { margin-top: .55rem; }
+    .diff-field-name {
+      font-family: 'Menlo', monospace; font-size: .68rem;
+      background: #f0f2f8; padding: .08rem .3rem; border-radius: 2px;
+      color: #444; font-weight: 600;
+    }
+    .diff-row { display: flex; gap: .45rem; margin-top: .25rem; align-items: flex-start; }
+    .diff-label {
+      font-size: .6rem; font-weight: 700; padding: .1rem .3rem;
+      border-radius: 2px; flex-shrink: 0; margin-top: .05rem; letter-spacing: .03em;
+    }
+    .diff-label.before { background: #ffe8e8; color: #8b0000; }
+    .diff-label.after  { background: #d4f5e2; color: #1a7a4a; }
+    .diff-text {
+      font-family: 'Menlo', monospace; font-size: .71rem; color: #333;
+      word-break: break-word; white-space: pre-wrap;
+      max-height: 120px; overflow-y: auto;
+    }
   </style>
 </head>
 <body>
@@ -240,8 +295,12 @@
   <div class="login-box">
     <div class="login-icon">⚾</div>
     <h1>TABA Rule Editor</h1>
-    <p>Administrative access only.<br>Log in with your TABA admin account.</p>
-    <button id="login-btn">Log in</button>
+    <p>Administrative access only.</p>
+    <form id="login-form">
+      <input type="password" id="login-password" placeholder="Admin password" autocomplete="current-password">
+      <button type="submit" id="login-btn">Log in</button>
+      <p id="login-error" hidden>Incorrect password.</p>
+    </form>
   </div>
 </div>
 
@@ -253,10 +312,7 @@
       <span class="header-logo">⚾</span>
       <h1>TABA Rule Editor <span class="header-sub">Admin</span></h1>
     </div>
-    <div class="header-right">
-      <span id="user-email"></span>
-      <button id="logout-btn">Log out</button>
-    </div>
+    <button id="logout-btn">Log out</button>
   </header>
 
   <div class="tab-bar">
@@ -268,7 +324,7 @@
     <div class="toolbar">
       <label for="div-select">Division</label>
       <select id="div-select"></select>
-      <span class="toolbar-note">Changes are committed to GitHub and deployed in ~60 s.</span>
+      <span class="toolbar-note">Changes go live immediately on the next page load.</span>
     </div>
     <div id="editor-content"></div>
   </div>
@@ -283,33 +339,70 @@
 /* ════════════════════════════════════════════════════════════
    State
    ════════════════════════════════════════════════════════════ */
-let baseData    = {};  // deep-cloned window.TABADivisions (unmodified base)
-let amendments  = {};  // fetched from amendments.json
-let currentUser = null;
-let cardSeq     = 0;
+let baseData   = {};  // deep-cloned window.TABADivisions (unmodified base)
+let amendments = {};  // fetched from amendments.json
+let cardSeq    = 0;
 
 /* ════════════════════════════════════════════════════════════
-   Netlify Identity
+   Password auth
    ════════════════════════════════════════════════════════════ */
-document.getElementById('login-btn').addEventListener('click', () => netlify.identity.open());
-document.getElementById('logout-btn').addEventListener('click', () => netlify.identity.logout());
+function storedToken() { return sessionStorage.getItem('adminToken') || ''; }
+function authHeaders() { return { 'Authorization': `Bearer ${storedToken()}` }; }
 
-netlify.identity.on('init',   user => { if (user) enterApp(user); });
-netlify.identity.on('login',  user => { netlify.identity.close(); enterApp(user); });
-netlify.identity.on('logout', ()   => {
-  currentUser = null;
-  document.getElementById('admin-app').hidden = true;
-  document.getElementById('login-gate').hidden = false;
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pw    = document.getElementById('login-password').value;
+  const btn   = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  errEl.hidden = true;
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+
+  try {
+    const res = await fetch('/api/audit-log', {
+      headers: { 'Authorization': `Bearer ${pw}` },
+    });
+    if (res.ok) {
+      sessionStorage.setItem('adminToken', pw);
+      enterApp();
+    } else {
+      errEl.hidden = false;
+    }
+  } catch {
+    errEl.hidden = false;
+    errEl.textContent = 'Connection error — try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Log in';
+  }
 });
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('adminToken');
+  document.getElementById('admin-app').hidden  = true;
+  document.getElementById('login-gate').hidden = false;
+  document.getElementById('login-password').value = '';
+});
+
+// Auto-login if a session token is already stored
+(async () => {
+  const token = storedToken();
+  if (!token) return;
+  try {
+    const res = await fetch('/api/audit-log', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (res.ok) { enterApp(); return; }
+  } catch { /* fall through to login gate */ }
+  sessionStorage.removeItem('adminToken');
+})();
 
 /* ════════════════════════════════════════════════════════════
    App entry point
    ════════════════════════════════════════════════════════════ */
-async function enterApp(user) {
-  currentUser = user;
+async function enterApp() {
   document.getElementById('login-gate').hidden = true;
   document.getElementById('admin-app').hidden  = false;
-  document.getElementById('user-email').textContent = user.email;
 
   // Snapshot the unmodified base data
   baseData = JSON.parse(JSON.stringify(window.TABADivisions));
@@ -335,7 +428,7 @@ async function enterApp(user) {
    ════════════════════════════════════════════════════════════ */
 async function loadAmendments() {
   try {
-    const r = await fetch('../amendments.json?nc=' + Date.now());
+    const r = await fetch('/api/amendments?nc=' + Date.now());
     amendments = r.ok ? await r.json() : {};
   } catch {
     amendments = {};
@@ -394,9 +487,12 @@ function buildAdditionCard(divKey, addition) {
   const sid  = addition.id;
   const type = 'additions';
   const isAmended = amended(divKey, type, sid);
+  const meta = amendments?.[divKey]?.[type]?.[sid]?._meta;
 
   const badge   = effectiveVal(divKey, type, sid, 'badge',   addition.badge   || '');
   const content = effectiveVal(divKey, type, sid, 'content', addition.content || '');
+
+  const metaBlock = meta ? `<div class="amendment-ref">Last amended ${fmtDate(meta.updated)}</div>` : '';
 
   return `
     <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
@@ -406,6 +502,7 @@ function buildAdditionCard(divKey, addition) {
         ${isAmended ? '<span class="amended-tag">AMENDED</span>' : ''}
       </summary>
       <div class="card-body">
+        ${metaBlock}
         ${fieldText(cid, 'badge', 'Badge label', badge, 'Short label shown in the rule header.')}
         ${fieldContent(cid, 'content', content)}
         ${actions(cid, divKey, type, sid, 'badge,content', isAmended)}
@@ -418,11 +515,14 @@ function buildOverrideCard(divKey, ruleId, ov) {
   const cid  = 'c' + (++cardSeq);
   const type = 'overrides';
   const isAmended = amended(divKey, type, ruleId);
+  const meta = amendments?.[divKey]?.[type]?.[ruleId]?._meta;
 
-  const label         = effectiveVal(divKey, type, ruleId, 'label',         ov.label         || ruleId);
-  const bcMinorSum    = effectiveVal(divKey, type, ruleId, 'bcMinorSummary', ov.bcMinorSummary || '');
-  const tabaSum       = effectiveVal(divKey, type, ruleId, 'tabaSummary',   ov.tabaSummary   || '');
-  const content       = effectiveVal(divKey, type, ruleId, 'content',       ov.content       || '');
+  const label      = effectiveVal(divKey, type, ruleId, 'label',         ov.label         || ruleId);
+  const bcMinorSum = effectiveVal(divKey, type, ruleId, 'bcMinorSummary', ov.bcMinorSummary || '');
+  const tabaSum    = effectiveVal(divKey, type, ruleId, 'tabaSummary',   ov.tabaSummary   || '');
+  const content    = effectiveVal(divKey, type, ruleId, 'content',       ov.content       || '');
+
+  const metaBlock = meta ? `<div class="amendment-ref">Last amended ${fmtDate(meta.updated)}</div>` : '';
 
   return `
     <details class="rule-card${isAmended ? ' amended' : ''}" id="${cid}-details">
@@ -432,6 +532,7 @@ function buildOverrideCard(divKey, ruleId, ov) {
         ${isAmended ? '<span class="amended-tag">AMENDED</span>' : ''}
       </summary>
       <div class="card-body">
+        ${metaBlock}
         ${fieldText(cid, 'label', 'Override panel label', label, '')}
         ${fieldTextarea(cid, 'bcMinorSummary', 'BC Minor Summary (left column)', bcMinorSum)}
         ${fieldTextarea(cid, 'tabaSummary',    'TABA Summary (right column header)', tabaSum)}
@@ -534,13 +635,9 @@ async function handleSave(btn, divKey) {
   });
 
   try {
-    const token = await currentUser.jwt();
-    const res = await fetch('/.netlify/functions/save-amendment', {
+    const res = await fetch('/api/save-amendment', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ divisionKey: div, sectionType, sectionId, changes }),
     });
 
@@ -554,6 +651,7 @@ async function handleSave(btn, divKey) {
     if (!amendments[div][sectionType])             amendments[div][sectionType] = {};
     if (!amendments[div][sectionType][sectionId])  amendments[div][sectionType][sectionId] = {};
     Object.assign(amendments[div][sectionType][sectionId], changes);
+    amendments[div][sectionType][sectionId]._meta = { updated: new Date().toISOString(), author: 'admin' };
 
     // Mark card visually
     const details = document.getElementById(cid + '-details');
@@ -565,7 +663,7 @@ async function handleSave(btn, divKey) {
       }
     }
 
-    statusEl.textContent = '✓ Saved — site redeploys in ~60 s.';
+    statusEl.textContent = '✓ Saved — live on next page load.';
     statusEl.className = 'save-status ok';
   } catch (err) {
     statusEl.textContent = '✗ ' + err.message;
@@ -588,13 +686,9 @@ async function handleRevert(btn, divKey) {
   statusEl.className = 'save-status';
 
   try {
-    const token = await currentUser.jwt();
-    const res = await fetch('/.netlify/functions/revert-amendment', {
+    const res = await fetch('/api/revert-amendment', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ divisionKey: div, sectionType, sectionId }),
     });
 
@@ -618,14 +712,16 @@ async function handleRevert(btn, divKey) {
 /* ════════════════════════════════════════════════════════════
    Audit log
    ════════════════════════════════════════════════════════════ */
+function truncate(str, max) {
+  const s = str == null ? '' : String(str);
+  return s.length > max ? s.slice(0, max) + '…' : s;
+}
+
 async function loadAuditLog() {
   const el = document.getElementById('audit-content');
   el.innerHTML = '<p class="empty-msg">Loading…</p>';
   try {
-    const token = await currentUser.jwt();
-    const res = await fetch('/.netlify/functions/audit-log', {
-      headers: { 'Authorization': `Bearer ${token}` },
-    });
+    const res = await fetch('/api/audit-log', { headers: authHeaders() });
     if (!res.ok) throw new Error(`Server error ${res.status}`);
     const entries = await res.json();
 
@@ -634,19 +730,38 @@ async function loadAuditLog() {
       return;
     }
 
-    el.innerHTML = entries.map(e => `
-      <div class="audit-entry">
-        <div class="audit-msg">${escH(e.message)}</div>
-        <div class="audit-meta">
-          <span class="audit-sha">${e.sha}</span>
-          <span>·</span>
-          <span>${escH(e.author)}</span>
-          <span>·</span>
-          <span>${new Date(e.date).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' })}</span>
-          <span>·</span>
-          <a class="audit-link" href="${escA(e.url)}" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a>
+    el.innerHTML = entries.map(e => {
+      const date        = new Date(e.timestamp).toLocaleString('en-CA', { dateStyle: 'medium', timeStyle: 'short' });
+      const actionLabel = e.action === 'revert' ? 'Reverted' : 'Updated';
+
+      const diffHtml = (e.changedFields || []).map(f => {
+        const beforeVal = e.before?.[f] === null ? '(not previously set)' : truncate(e.before?.[f], 400);
+        const afterVal  = e.action === 'revert' ? '(reverted to original)' : truncate(e.after?.[f], 400);
+        return `<div class="diff-field">
+          <span class="diff-field-name">${escH(f)}</span>
+          <div class="diff-row">
+            <span class="diff-label before">Before</span>
+            <span class="diff-text">${escH(beforeVal)}</span>
+          </div>
+          <div class="diff-row">
+            <span class="diff-label after">After</span>
+            <span class="diff-text">${escH(afterVal)}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `<div class="audit-entry">
+        <div class="audit-header">
+          <span class="audit-action ${escH(e.action)}">${escH(actionLabel)}</span>
+          <span class="audit-section">${escH(e.divisionKey)} / ${escH(e.sectionId)}</span>
+          <span class="audit-date">${date}</span>
         </div>
-      </div>`).join('');
+        <details class="audit-diff">
+          <summary>Show changes (${escH((e.changedFields || []).join(', '))})</summary>
+          ${diffHtml}
+        </details>
+      </div>`;
+    }).join('');
   } catch (err) {
     el.innerHTML = `<p class="empty-msg" style="color:#c0392b">Failed to load: ${escH(err.message)}</p>`;
   }
@@ -672,6 +787,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escA(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function escT(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 </script>
 </body>
 </html>
