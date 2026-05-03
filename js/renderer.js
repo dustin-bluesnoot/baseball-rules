@@ -12,7 +12,15 @@ window.Rulebook = (() => {
   let searchIndex     = [];   // built at render time
 
   // ─── Entry point ─────────────────────────────────────────
-  function init(divisionParam) {
+  async function init(divisionParam) {
+    try {
+      const resp = await fetch('/amendments.json');
+      if (resp.ok) {
+        const amendments = await resp.json();
+        if (amendments && typeof amendments === 'object') applyAmendments(amendments);
+      }
+    } catch (e) { /* proceed with base data if amendments.json is unavailable */ }
+
     const key = divisionParam ? divisionParam.toLowerCase() : null;
     if (key && window.TABADivisions[key]) {
       currentDivision = key;
@@ -23,6 +31,24 @@ window.Rulebook = (() => {
     } else {
       renderLanding();
     }
+  }
+
+  function applyAmendments(amendments) {
+    Object.entries(amendments).forEach(([divKey, divAmends]) => {
+      const div = window.TABADivisions[divKey];
+      if (!div) return;
+      if (divAmends.additions) {
+        (div.additions || []).forEach(addition => {
+          const patch = divAmends.additions[addition.id];
+          if (patch) Object.assign(addition, patch);
+        });
+      }
+      if (divAmends.overrides) {
+        Object.entries(divAmends.overrides).forEach(([ruleId, patch]) => {
+          if (div.overrides?.[ruleId]) Object.assign(div.overrides[ruleId], patch);
+        });
+      }
+    });
   }
 
   // ─── Landing ──────────────────────────────────────────────
@@ -557,6 +583,6 @@ window.Rulebook = (() => {
     if (chev) chev.textContent = panel.classList.contains('dp-open') ? '▼' : '▶';
   }
 
-  return { init, goTo, toggleRule, togglePanel, handleSearch, searchKeydown, clearSearch };
+  return { init, applyAmendments, goTo, toggleRule, togglePanel, handleSearch, searchKeydown, clearSearch };
 
 })();

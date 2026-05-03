@@ -1,0 +1,9 @@
+{
+  "name": "baseball-rules",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TABA Rulebook — Netlify Functions dependencies",
+  "dependencies": {
+    "@octokit/rest": "^20.0.0"
+  }
+}

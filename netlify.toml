@@ -1,0 +1,22 @@
+[build]
+  functions = "netlify/functions"
+  publish   = "."
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Serve admin page at /admin (no trailing slash required)
+[[redirects]]
+  from   = "/admin"
+  to     = "/admin/index.html"
+  status = 200
+
+# Keep robots away from the admin UI
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag  = "noindex, nofollow"
+    X-Frame-Options = "DENY"
