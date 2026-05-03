@@ -323,7 +323,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
   btn.textContent = 'Checking…';
 
   try {
-    const res = await fetch('/.netlify/functions/audit-log', {
+    const res = await fetch('/api/audit-log', {
       headers: { 'Authorization': `Bearer ${pw}` },
     });
     if (res.ok) {
@@ -353,7 +353,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
   const token = storedToken();
   if (!token) return;
   try {
-    const res = await fetch('/.netlify/functions/audit-log', {
+    const res = await fetch('/api/audit-log', {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (res.ok) { enterApp(); return; }
@@ -603,7 +603,7 @@ async function handleSave(btn, divKey) {
   });
 
   try {
-    const res = await fetch('/.netlify/functions/save-amendment', {
+    const res = await fetch('/api/save-amendment', {
       method: 'POST',
       headers: { ...authHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ divisionKey: div, sectionType, sectionId, changes }),
@@ -653,7 +653,7 @@ async function handleRevert(btn, divKey) {
   statusEl.className = 'save-status';
 
   try {
-    const res = await fetch('/.netlify/functions/revert-amendment', {
+    const res = await fetch('/api/revert-amendment', {
       method: 'POST',
       headers: { ...authHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify({ divisionKey: div, sectionType, sectionId }),
@@ -683,7 +683,7 @@ async function loadAuditLog() {
   const el = document.getElementById('audit-content');
   el.innerHTML = '<p class="empty-msg">Loading…</p>';
   try {
-    const res = await fetch('/.netlify/functions/audit-log', { headers: authHeaders() });
+    const res = await fetch('/api/audit-log', { headers: authHeaders() });
     if (!res.ok) throw new Error(`Server error ${res.status}`);
     const entries = await res.json();
 

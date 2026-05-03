@@ -1,14 +1,3 @@
-/**
- * revert-amendment.js
- * POST /.netlify/functions/revert-amendment
- *
- * Removes a specific section's amendments from amendments.json,
- * restoring it to base data, and commits the result.
- *
- * Requires Netlify Identity JWT in Authorization header.
- * Requires GITHUB_TOKEN env var.
- */
-
 const { Octokit } = require('@octokit/rest');
 
 const OWNER  = 'dustin-bluesnoot';
@@ -16,26 +5,19 @@ const REPO   = 'baseball-rules';
 const PATH   = 'amendments.json';
 const BRANCH = 'main';
 
-exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).end('Method Not Allowed');
   }
 
-  const auth = event.headers['authorization'] || '';
+  const auth = req.headers['authorization'] || '';
   if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  let body;
-  try {
-    body = JSON.parse(event.body);
-  } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) };
-  }
-
-  const { divisionKey, sectionType, sectionId } = body;
+  const { divisionKey, sectionType, sectionId } = req.body || {};
   if (!divisionKey || !sectionType || !sectionId) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -50,6 +32,10 @@ exports.handler = async (event, context) => {
     sha = data.sha;
   } catch (err) {
     if (err.status !== 404) throw err;
+  }
+
+  if (!sha) {
+    return res.status(200).json({ success: true, message: 'Nothing to revert' });
   }
 
   // Remove the specific section's amendments
@@ -75,9 +61,5 @@ exports.handler = async (event, context) => {
     sha,
   });
 
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ success: true, message }),
-  };
+  return res.status(200).json({ success: true, message });
 };

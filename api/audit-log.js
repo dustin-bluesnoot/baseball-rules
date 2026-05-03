@@ -1,28 +1,17 @@
-/**
- * audit-log.js
- * GET /.netlify/functions/audit-log
- *
- * Returns the last 50 commits that touched amendments.json,
- * providing a full audit trail of CMS edits.
- *
- * Requires Netlify Identity JWT in Authorization header.
- * Requires GITHUB_TOKEN env var.
- */
-
 const { Octokit } = require('@octokit/rest');
 
 const OWNER = 'dustin-bluesnoot';
 const REPO  = 'baseball-rules';
 const PATH  = 'amendments.json';
 
-exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'GET') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+module.exports = async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).end('Method Not Allowed');
   }
 
-  const auth = event.headers['authorization'] || '';
+  const auth = req.headers['authorization'] || '';
   if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -42,9 +31,5 @@ exports.handler = async (event, context) => {
       url:     c.html_url,
     }));
 
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(log),
-  };
+  return res.status(200).json(log);
 };

@@ -1,14 +1,3 @@
-/**
- * save-amendment.js
- * POST /.netlify/functions/save-amendment
- *
- * Merges field changes for a specific rule section into amendments.json
- * and commits the result to the main branch via GitHub API.
- *
- * Requires ADMIN_PASSWORD env var in Authorization: Bearer header.
- * Requires GITHUB_TOKEN env var (fine-grained PAT, Contents: read+write).
- */
-
 const { Octokit } = require('@octokit/rest');
 
 const OWNER  = 'dustin-bluesnoot';
@@ -18,31 +7,24 @@ const BRANCH = 'main';
 
 const ALLOWED_FIELDS = ['badge', 'content', 'label', 'bcMinorSummary', 'tabaSummary'];
 
-exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).end('Method Not Allowed');
   }
 
-  const auth = event.headers['authorization'] || '';
+  const auth = req.headers['authorization'] || '';
   if (!process.env.ADMIN_PASSWORD || auth !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
-    return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorized' }) };
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  let body;
-  try {
-    body = JSON.parse(event.body);
-  } catch {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON body' }) };
-  }
-
-  const { divisionKey, sectionType, sectionId, changes } = body;
+  const { divisionKey, sectionType, sectionId, changes } = req.body || {};
 
   if (!divisionKey || !sectionType || !sectionId || !changes || typeof changes !== 'object') {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   if (!['additions', 'overrides'].includes(sectionType)) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid sectionType' }) };
+    return res.status(400).json({ error: 'Invalid sectionType' });
   }
 
   // Whitelist editable fields
@@ -53,7 +35,7 @@ exports.handler = async (event, context) => {
     }
   }
   if (Object.keys(sanitized).length === 0) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'No valid fields to update' }) };
+    return res.status(400).json({ error: 'No valid fields to update' });
   }
 
   const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -69,7 +51,6 @@ exports.handler = async (event, context) => {
     sha = data.sha;
   } catch (err) {
     if (err.status !== 404) throw err;
-    // File doesn't exist yet — start fresh (no sha needed for creation)
   }
 
   // Deep merge
@@ -106,9 +87,5 @@ exports.handler = async (event, context) => {
     sha: fileState.sha,
   });
 
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ success: true, message }),
-  };
+  return res.status(200).json({ success: true, message });
 };
