@@ -34,7 +34,7 @@
       <strong>Admin Mode</strong><span class="admin-banner-sep">—</span>inline editing enabled on all rules
     </div>
     <div class="admin-banner-right">
-      <a href="/admin" class="admin-banner-link" target="_blank" rel="noopener">Audit Log ↗</a>
+      <a href="/admin" class="admin-banner-link">Audit Log ↗</a>
       <button onclick="adminLogout()" class="admin-banner-logout">Log out</button>
     </div>
   </div>
@@ -71,13 +71,13 @@
 
   <script>
     /* ── Admin mode: set BEFORE renderer.js loads ── */
-    window.isAdminMode = !!sessionStorage.getItem('adminToken');
+    window.isAdminMode = !!localStorage.getItem('adminToken');
     if (window.isAdminMode) {
       document.getElementById('admin-banner').style.display = '';
       document.body.classList.add('admin-mode');
     }
 
-    function _adminToken() { return sessionStorage.getItem('adminToken') || ''; }
+    function _adminToken() { return localStorage.getItem('adminToken') || ''; }
 
     function showError(msg) {
       document.getElementById('load-status').innerHTML =
@@ -108,7 +108,7 @@
       try {
         const res = await fetch('/api/audit-log', { headers: { 'Authorization': `Bearer ${pw}` } });
         if (res.ok) {
-          sessionStorage.setItem('adminToken', pw);
+          localStorage.setItem('adminToken', pw);
           closeAdminModal();
           location.reload();
         } else {
@@ -124,7 +124,7 @@
     }
 
     function adminLogout() {
-      sessionStorage.removeItem('adminToken');
+      localStorage.removeItem('adminToken');
       location.reload();
     }
 
