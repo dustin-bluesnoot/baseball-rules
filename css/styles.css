@@ -714,11 +714,19 @@ body.admin-mode { padding-top: 38px; }
 }
 .mode-btn.active { background: #2c3e50; color: #fff; border-color: #2c3e50; }
 .editor-loading { color: #888; font-size: .8rem; padding: .75rem 0; }
-/* Quill editor sizing overrides */
-#ef-quill-editor { background: #fff; }
-.ql-toolbar.ql-snow { border-radius: 5px 5px 0 0; border-color: #c9d0df; }
-.ql-container.ql-snow { border-radius: 0 0 5px 5px; border-color: #c9d0df; font-size: 13px; }
-.ql-editor { min-height: 180px; max-height: 380px; overflow-y: auto; line-height: 1.65; }
+/* Visual (contenteditable) editor */
+.ve-toolbar { display: flex; gap: 4px; align-items: center; padding: 5px 7px; background: #f6f7fb; border: 1px solid #c9d0df; border-radius: 5px 5px 0 0; flex-wrap: wrap; }
+.ve-btn { background: #fff; border: 1px solid #c9d0df; border-radius: 3px; padding: 2px 8px; font-size: .78rem; cursor: pointer; color: #333; font-family: inherit; }
+.ve-btn:hover { background: #e8ecf5; }
+.ve-btn-warn { color: #a05a00; border-color: #e0b060; background: #fffbf0; }
+.ve-btn-warn:hover { background: #fff3d0; }
+.ve-content {
+  min-height: 200px; max-height: 420px; overflow-y: auto;
+  border: 1px solid #c9d0df; border-top: none; border-radius: 0 0 5px 5px;
+  padding: .7rem .9rem; background: #fff; font-size: .88rem; line-height: 1.65;
+  outline: none;
+}
+.ve-content:focus { border-color: #2980b9; box-shadow: 0 0 0 2px rgba(41,128,185,.12); }
 
 /* ── Content editor toolbar ── */
 .editor-toolbar {
