@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "TABA Rulebook — Vercel API dependencies",
   "dependencies": {
-    "@upstash/redis": "^1.34.0"
+    "@upstash/redis": "^1.34.0",
+    "resend": "^4.0.0"
   }
 }
