@@ -703,6 +703,23 @@ body.admin-mode { padding-top: 38px; }
 .edit-revert-btn:hover { background: #fff4f4; }
 .edit-status-msg { font-size: .8rem; color: #555; }
 
+/* ── Visual / Code mode toggle ── */
+.editor-mode-bar {
+  display: inline-flex; gap: 3px; margin-left: .6rem; vertical-align: middle;
+}
+.mode-btn {
+  background: #f0f2f8; border: 1px solid #c9d0df; border-radius: 4px;
+  padding: 1px 9px; font-size: 11px; cursor: pointer; color: #555;
+  font-family: inherit; font-weight: 500; transition: background .12s;
+}
+.mode-btn.active { background: #2c3e50; color: #fff; border-color: #2c3e50; }
+.editor-loading { color: #888; font-size: .8rem; padding: .75rem 0; }
+/* Quill editor sizing overrides */
+#ef-quill-editor { background: #fff; }
+.ql-toolbar.ql-snow { border-radius: 5px 5px 0 0; border-color: #c9d0df; }
+.ql-container.ql-snow { border-radius: 0 0 5px 5px; border-color: #c9d0df; font-size: 13px; }
+.ql-editor { min-height: 180px; max-height: 380px; overflow-y: auto; line-height: 1.65; }
+
 /* ── Content editor toolbar ── */
 .editor-toolbar {
   display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;
