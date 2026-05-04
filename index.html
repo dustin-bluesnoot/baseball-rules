@@ -134,6 +134,70 @@
     function _escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function _escText(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    const _SNIPPETS = {
+      'callout-blue':  '<div class="callout blue">\n  <p>Text here.</p>\n</div>',
+      'callout-red':   '<div class="callout red">\n  <p><strong>Note:</strong> Text here.</p>\n</div>',
+      'callout-navy':  '<div class="callout navy">\n  <p><strong>Heading:</strong></p>\n  <ol class="nl">\n    <li>Item one</li>\n    <li>Item two</li>\n  </ol>\n</div>',
+      'ul':            '<ul class="rl">\n  <li>Item one</li>\n  <li>Item two</li>\n</ul>',
+      'ol':            '<ol class="nl">\n  <li>Item one</li>\n  <li>Item two</li>\n</ol>',
+      'table':         '<table>\n  <thead><tr><th>Column</th><th>Value</th></tr></thead>\n  <tbody>\n    <tr><td class="hi">Row 1</td><td>Value</td></tr>\n  </tbody>\n</table>',
+      'sub-rule':      '<div class="sub-rule">\n  <div class="sub-rule-title">Section Title</div>\n  <p>Content here.</p>\n</div>',
+      'note':          '<p class="note">Additional note here.</p>',
+    };
+
+    function _insertSnippet(ta, text) {
+      const s = ta.selectionStart, e = ta.selectionEnd;
+      ta.value = ta.value.slice(0, s) + text + ta.value.slice(e);
+      ta.selectionStart = ta.selectionEnd = s + text.length;
+      ta.dispatchEvent(new Event('input')); ta.focus();
+    }
+
+    function _wrapSelection(ta, before, after) {
+      const s = ta.selectionStart, e = ta.selectionEnd;
+      const sel = ta.value.slice(s, e) || 'text';
+      const rep = before + sel + after;
+      ta.value = ta.value.slice(0, s) + rep + ta.value.slice(e);
+      ta.selectionStart = s; ta.selectionEnd = s + rep.length;
+      ta.dispatchEvent(new Event('input')); ta.focus();
+    }
+
+    function _contentField(val) {
+      return `<div class="edit-field">
+        <label>Content (HTML)</label>
+        <div class="editor-toolbar">
+          <button type="button" class="tb-btn" data-wrap-b="&lt;strong&gt;" data-wrap-a="&lt;/strong&gt;">Bold</button>
+          <button type="button" class="tb-btn" data-wrap-b="&lt;a href=&quot;#&quot; class=&quot;bcm-link&quot;&gt;" data-wrap-a="&lt;/a&gt;">BC Link</button>
+          <span class="tb-sep"></span>
+          <button type="button" class="tb-btn" data-snip="callout-blue">Callout blue</button>
+          <button type="button" class="tb-btn" data-snip="callout-red">Callout red</button>
+          <button type="button" class="tb-btn" data-snip="callout-navy">Callout navy</button>
+          <span class="tb-sep"></span>
+          <button type="button" class="tb-btn" data-snip="ul">Bullet list</button>
+          <button type="button" class="tb-btn" data-snip="ol">Numbered list</button>
+          <button type="button" class="tb-btn" data-snip="table">Table</button>
+          <span class="tb-sep"></span>
+          <button type="button" class="tb-btn" data-snip="sub-rule">Sub-rule</button>
+          <button type="button" class="tb-btn" data-snip="note">Note</button>
+        </div>
+        <textarea id="ef-content" rows="10">${_escText(val)}</textarea>
+        <div class="editor-preview-label">Preview</div>
+        <div class="editor-preview-live" id="ef-content-preview">${val}</div>
+      </div>`;
+    }
+
+    function _attachEditorHandlers() {
+      const ta = document.getElementById('ef-content');
+      if (!ta) return;
+      const preview = document.getElementById('ef-content-preview');
+      ta.addEventListener('input', () => { preview.innerHTML = ta.value; });
+      document.querySelectorAll('#edit-fields .tb-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.snip)  _insertSnippet(ta, _SNIPPETS[btn.dataset.snip] || '');
+          if (btn.dataset.wrapB) _wrapSelection(ta, btn.dataset.wrapB.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'), btn.dataset.wrapA.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'));
+        });
+      });
+    }
+
     window.openEditDrawer = function (dataset) {
       const { editType, editId, divKey } = dataset;
       const div = window.TABADivisions[divKey];
@@ -160,15 +224,16 @@
       let html = '';
       if (editType === 'additions') {
         html += field('badge',   'Badge label',     current.badge   || '', 'input');
-        html += field('content', 'Content (HTML)',  current.content || '', 'textarea', 10);
+        html += _contentField(current.content || '');
       } else {
         html += field('label',          'Panel label',      current.label          || '', 'input');
         html += field('bcMinorSummary', 'BC Minor summary',  current.bcMinorSummary || '', 'textarea', 3);
         html += field('tabaSummary',    'Division summary',  current.tabaSummary    || '', 'textarea', 3);
-        html += field('content',        'Content (HTML)',    current.content        || '', 'textarea', 8);
+        html += _contentField(current.content || '');
       }
 
       document.getElementById('edit-fields').innerHTML = html;
+      _attachEditorHandlers();
       document.getElementById('edit-drawer').style.display = '';
       document.getElementById('edit-drawer').scrollTop = 0;
     };
