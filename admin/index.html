@@ -296,8 +296,9 @@
     <div class="login-icon">⚾</div>
     <h1>TABA Rule Editor</h1>
     <p>Administrative access only.</p>
-    <form id="login-form">
-      <input type="password" id="login-password" placeholder="Admin password" autocomplete="current-password">
+    <form id="login-form" autocomplete="on">
+      <input type="text" name="username" style="display:none" autocomplete="username" aria-hidden="true">
+      <input type="password" id="login-password" name="password" placeholder="Admin password" autocomplete="current-password">
       <button type="submit" id="login-btn">Log in</button>
       <p id="login-error" hidden>Incorrect password.</p>
     </form>
