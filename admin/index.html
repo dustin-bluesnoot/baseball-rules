@@ -195,6 +195,27 @@
     .save-status.ok  { color: #27ae60; }
     .save-status.err { color: #c0392b; }
 
+    /* ── Editor toolbar ─────────────────────────── */
+    .editor-toolbar { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 5px; }
+    .tb-btn {
+      background: #f0f2f8; border: 1px solid #c9d0df; border-radius: 3px;
+      padding: 1px 7px; font-size: .7rem; cursor: pointer; color: #1a1a2e;
+      font-family: inherit; line-height: 1.7; transition: background .12s;
+    }
+    .tb-btn:hover { background: #dde1eb; }
+    .tb-sep { display: inline-block; width: 1px; background: #c9d0df; margin: 2px 2px; align-self: stretch; }
+    .editor-preview-label {
+      font-size: .6rem; font-weight: 700; color: #888;
+      text-transform: uppercase; letter-spacing: .08em;
+      margin-top: 6px; margin-bottom: 3px;
+    }
+    .editor-preview-live {
+      border: 1px solid #c9d0df; border-radius: 4px;
+      padding: 8px 10px; background: #fafbfd;
+      font-size: .82rem; line-height: 1.6;
+      min-height: 40px; max-height: 240px; overflow-y: auto;
+    }
+
     /* ── Audit log ──────────────────────────────── */
     .audit-entry {
       background: #fff; border: 1px solid #dde1eb; border-radius: 8px;
@@ -477,16 +498,55 @@ function fieldTextarea(cid, field, label, value) {
   </div>`;
 }
 
+const SNIPS = {
+  'callout-blue':  '<div class="callout blue">\n  <p>Text here.</p>\n</div>',
+  'callout-red':   '<div class="callout red">\n  <p><strong>Note:</strong> Text here.</p>\n</div>',
+  'callout-navy':  '<div class="callout navy">\n  <p><strong>Heading:</strong></p>\n  <ol class="nl">\n    <li>Item one</li>\n    <li>Item two</li>\n  </ol>\n</div>',
+  'ul':            '<ul class="rl">\n  <li>Item one</li>\n  <li>Item two</li>\n</ul>',
+  'ol':            '<ol class="nl">\n  <li>Item one</li>\n  <li>Item two</li>\n</ol>',
+  'table':         '<table>\n  <thead><tr><th>Column</th><th>Value</th></tr></thead>\n  <tbody>\n    <tr><td class="hi">Row 1</td><td>Value</td></tr>\n  </tbody>\n</table>',
+  'sub-rule':      '<div class="sub-rule">\n  <div class="sub-rule-title">Section Title</div>\n  <p>Content here.</p>\n</div>',
+  'note':          '<p class="note">Additional note here.</p>',
+};
+
+function _insertAt(ta, text) {
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + text + ta.value.slice(e);
+  ta.selectionStart = ta.selectionEnd = s + text.length;
+  ta.dispatchEvent(new Event('input')); ta.focus();
+}
+function _wrap(ta, before, after) {
+  const s = ta.selectionStart, e = ta.selectionEnd;
+  const sel = ta.value.slice(s, e) || 'text';
+  const rep = before + sel + after;
+  ta.value = ta.value.slice(0, s) + rep + ta.value.slice(e);
+  ta.selectionStart = s; ta.selectionEnd = s + rep.length;
+  ta.dispatchEvent(new Event('input')); ta.focus();
+}
+
 function fieldContent(cid, field, value) {
-  const previewId = cid + '-' + field + '-preview';
+  const taId = `${cid}-${field}`;
+  const preId = `${taId}-preview`;
   return `<div class="field">
     <label>Content (HTML)</label>
-    <div class="preview-wrap">
-      <button class="btn-preview" data-preview-toggle="${previewId}" data-preview-src="${cid}-${field}">Preview HTML</button>
+    <div class="editor-toolbar">
+      <button type="button" class="tb-btn" data-ta="${taId}" data-wrap-b="&lt;strong&gt;" data-wrap-a="&lt;/strong&gt;">Bold</button>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-wrap-b='&lt;a href="#" class="bcm-link"&gt;' data-wrap-a="&lt;/a&gt;">BC Link</button>
+      <span class="tb-sep"></span>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="callout-blue">Callout blue</button>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="callout-red">Callout red</button>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="callout-navy">Callout navy</button>
+      <span class="tb-sep"></span>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="ul">Bullet list</button>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="ol">Numbered list</button>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="table">Table</button>
+      <span class="tb-sep"></span>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="sub-rule">Sub-rule</button>
+      <button type="button" class="tb-btn" data-ta="${taId}" data-snip="note">Note</button>
     </div>
-    <textarea id="${cid}-${field}" class="content-area">${escT(value)}</textarea>
-    <div class="preview-pane" id="${previewId}"></div>
-    <p class="hint">HTML rendered directly — use existing callout/table classes from the rulebook.</p>
+    <textarea id="${taId}" class="content-area">${escT(value)}</textarea>
+    <div class="editor-preview-label">Preview</div>
+    <div class="editor-preview-live" id="${preId}">${value}</div>
   </div>`;
 }
 
@@ -512,17 +572,21 @@ function actions(cid, divKey, type, sectionId, fields, isAmended) {
    Event listeners
    ════════════════════════════════════════════════════════════ */
 function attachCardListeners(container, divKey) {
-  // Preview toggles
-  container.querySelectorAll('[data-preview-toggle]').forEach(btn => {
+  // Live preview — update as you type
+  container.querySelectorAll('.content-area').forEach(ta => {
+    const preview = document.getElementById(ta.id + '-preview');
+    if (preview) ta.addEventListener('input', () => { preview.innerHTML = ta.value; });
+  });
+
+  // Toolbar snippet / wrap buttons
+  container.querySelectorAll('.tb-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const pane = document.getElementById(btn.dataset.previewToggle);
-      const src  = document.getElementById(btn.dataset.previewSrc);
-      if (pane.classList.toggle('visible')) {
-        pane.innerHTML = src.value;
-        btn.textContent = 'Hide preview';
-      } else {
-        btn.textContent = 'Preview HTML';
-      }
+      const ta = document.getElementById(btn.dataset.ta);
+      if (!ta) return;
+      if (btn.dataset.snip) _insertAt(ta, SNIPS[btn.dataset.snip] || '');
+      if (btn.dataset.wrapB) _wrap(ta,
+        btn.dataset.wrapB.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'),
+        btn.dataset.wrapA.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'));
     });
   });
 

@@ -703,6 +703,33 @@ body.admin-mode { padding-top: 38px; }
 .edit-revert-btn:hover { background: #fff4f4; }
 .edit-status-msg { font-size: .8rem; color: #555; }
 
+/* ── Content editor toolbar ── */
+.editor-toolbar {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px;
+}
+.editor-toolbar .tb-btn {
+  background: #f0f2f8; border: 1px solid #c9d0df; border-radius: 4px;
+  padding: 2px 9px; font-size: 11px; cursor: pointer; color: #1a1a2e;
+  font-family: inherit; line-height: 1.7; transition: background .12s;
+  white-space: nowrap;
+}
+.editor-toolbar .tb-btn:hover { background: #dde1eb; border-color: #aab0c4; }
+.editor-toolbar .tb-sep {
+  display: inline-block; width: 1px; background: #c9d0df;
+  margin: 2px 2px; align-self: stretch;
+}
+.editor-preview-label {
+  font-size: 10px; font-weight: 700; color: #888;
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-top: 8px; margin-bottom: 4px;
+}
+.editor-preview-live {
+  border: 1px solid #c9d0df; border-radius: 5px;
+  padding: 10px 14px; background: #fafbfd;
+  font-size: 13px; line-height: 1.65;
+  min-height: 48px; max-height: 280px; overflow-y: auto;
+}
+
 /* ── Responsive ── */
 @media print {
   #sidebar { display: none; }
