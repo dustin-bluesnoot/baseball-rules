@@ -359,10 +359,10 @@ document.getElementById('login-form').addEventListener('submit', async e => {
   btn.textContent = 'Checking…';
 
   try {
-    const res = await fetch('/api/audit-log', {
+    const res = await fetch('/api/audit-log?nc=' + Date.now(), {
       headers: { 'Authorization': `Bearer ${pw}` },
     });
-    if (res.ok) {
+    if (res.ok || res.status === 304) {
       localStorage.setItem('adminToken', pw);
       await enterApp();
     } else if (res.status === 401) {
@@ -393,12 +393,12 @@ document.getElementById('logout-btn').addEventListener('click', () => {
   const token = storedToken();
   if (!token) return;
   try {
-    const res = await fetch('/api/audit-log', {
+    const res = await fetch('/api/audit-log?nc=' + Date.now(), {
       headers: { 'Authorization': `Bearer ${token}` },
     });
-    if (res.ok) { await enterApp(); return; }
+    if (res.ok || res.status === 304) { await enterApp(); return; }
+    if (res.status === 401) localStorage.removeItem('adminToken');
   } catch { /* fall through to login gate */ }
-  localStorage.removeItem('adminToken');
 })();
 
 /* ════════════════════════════════════════════════════════════
