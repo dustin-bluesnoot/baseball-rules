@@ -14,12 +14,18 @@ window.Rulebook = (() => {
   // ─── Entry point ─────────────────────────────────────────
   async function init(divisionParam) {
     try {
-      const resp = await fetch('/api/amendments');
+      const resp = await fetch('/api/amendments?v=' + Date.now());
       if (resp.ok) {
         const amendments = await resp.json();
+        const divCount = Object.keys(amendments).length;
+        console.log('[rulebook] amendments loaded:', divCount, 'division(s)', amendments);
         if (amendments && typeof amendments === 'object') applyAmendments(amendments);
+      } else {
+        console.warn('[rulebook] /api/amendments returned', resp.status);
       }
-    } catch (e) { /* proceed with base data if KV is unavailable */ }
+    } catch (e) {
+      console.warn('[rulebook] /api/amendments fetch failed:', e.message);
+    }
 
     const key = divisionParam ? divisionParam.toLowerCase() : null;
     if (key && window.TABADivisions[key]) {
