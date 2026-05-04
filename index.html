@@ -10,6 +10,55 @@
 </head>
 <body>
 
+  <!-- ── Admin login modal ─────────────────────────────────── -->
+  <div id="admin-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="admin-modal-heading">
+    <div class="admin-modal-backdrop" onclick="closeAdminModal()"></div>
+    <div class="admin-modal-box">
+      <button class="admin-modal-close" onclick="closeAdminModal()" aria-label="Close">✕</button>
+      <div class="admin-modal-icon">🔒</div>
+      <h2 id="admin-modal-heading">Admin Access</h2>
+      <p>Enter your admin password to enable inline rule editing.</p>
+      <form id="admin-login-form" onsubmit="adminLogin(event)" autocomplete="on">
+        <input type="text" name="username" style="display:none" autocomplete="username" aria-hidden="true">
+        <input type="password" id="admin-modal-pw" name="password" placeholder="Admin password" autocomplete="current-password">
+        <button type="submit" id="admin-login-btn">Log in</button>
+        <p id="admin-login-err" class="admin-modal-err" style="display:none"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Admin banner (shown when authenticated) ───────────── -->
+  <div id="admin-banner" style="display:none" role="status">
+    <div class="admin-banner-left">
+      <span class="admin-banner-dot"></span>
+      <strong>Admin Mode</strong><span class="admin-banner-sep">—</span>inline editing enabled on all rules
+    </div>
+    <div class="admin-banner-right">
+      <a href="/admin" class="admin-banner-link" target="_blank" rel="noopener">Audit Log ↗</a>
+      <button onclick="adminLogout()" class="admin-banner-logout">Log out</button>
+    </div>
+  </div>
+
+  <!-- ── Edit drawer (slides up when ✎ Edit is clicked) ────── -->
+  <div id="edit-drawer" style="display:none" role="complementary" aria-label="Rule editor">
+    <div class="edit-drawer-header">
+      <div class="edit-drawer-title-row">
+        <span class="edit-drawer-label">Editing:</span>
+        <span id="edit-drawer-title"></span>
+      </div>
+      <button onclick="closeEditDrawer()" class="edit-drawer-close" aria-label="Close editor">✕</button>
+    </div>
+    <div class="edit-drawer-body">
+      <div id="edit-fields"></div>
+      <div class="edit-drawer-actions">
+        <button onclick="saveEdit()" class="edit-save-btn">Save Changes</button>
+        <button onclick="revertEdit()" class="edit-revert-btn">Revert to Original</button>
+        <span id="edit-status" class="edit-status-msg"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── App shell ─────────────────────────────────────────── -->
   <div id="app">
     <div id="loading">
       <span class="load-icon">⚾</span>
@@ -21,13 +70,162 @@
   <main id="main" style="display:none"></main>
 
   <script>
-    // Show any load failure visibly on screen
+    /* ── Admin mode: set BEFORE renderer.js loads ── */
+    window.isAdminMode = !!sessionStorage.getItem('adminToken');
+    if (window.isAdminMode) {
+      document.getElementById('admin-banner').style.display = '';
+      document.body.classList.add('admin-mode');
+    }
+
+    function _adminToken() { return sessionStorage.getItem('adminToken') || ''; }
+
     function showError(msg) {
       document.getElementById('load-status').innerHTML =
         '<span style="color:#c0392b;font-weight:bold">Error: ' + msg + '</span>';
       console.error('Rulebook error:', msg);
     }
     window._loaded = { rules: false, divisions: false, renderer: false };
+
+    /* ── Admin modal ──────────────────────────────── */
+    window.openAdminModal = function () {
+      document.getElementById('admin-modal').style.display = '';
+      setTimeout(() => document.getElementById('admin-modal-pw').focus(), 50);
+    };
+
+    function closeAdminModal() {
+      document.getElementById('admin-modal').style.display = 'none';
+      document.getElementById('admin-login-err').style.display = 'none';
+      document.getElementById('admin-modal-pw').value = '';
+    }
+
+    async function adminLogin(e) {
+      e.preventDefault();
+      const pw  = document.getElementById('admin-modal-pw').value;
+      const btn = document.getElementById('admin-login-btn');
+      const err = document.getElementById('admin-login-err');
+      btn.disabled = true; btn.textContent = 'Checking…';
+      err.style.display = 'none';
+      try {
+        const res = await fetch('/api/audit-log', { headers: { 'Authorization': `Bearer ${pw}` } });
+        if (res.ok) {
+          sessionStorage.setItem('adminToken', pw);
+          closeAdminModal();
+          location.reload();
+        } else {
+          err.textContent = res.status === 401 ? 'Incorrect password.' : `Server error (${res.status}) — check Vercel env vars.`;
+          err.style.display = '';
+        }
+      } catch {
+        err.textContent = 'Connection error — try again.';
+        err.style.display = '';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Log in';
+      }
+    }
+
+    function adminLogout() {
+      sessionStorage.removeItem('adminToken');
+      location.reload();
+    }
+
+    /* ── Edit drawer ──────────────────────────────── */
+    let _editCtx = null;
+
+    function _escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function _escText(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    window.openEditDrawer = function (dataset) {
+      const { editType, editId, divKey } = dataset;
+      const div = window.TABADivisions[divKey];
+      if (!div) return;
+
+      let current = {};
+      if (editType === 'additions') {
+        current = (div.additions || []).find(a => a.id === editId) || {};
+      } else {
+        current = (div.overrides || {})[editId] || {};
+      }
+      _editCtx = { divKey, sectionType: editType, sectionId: editId };
+
+      document.getElementById('edit-drawer-title').textContent = current.title || current.label || editId;
+      document.getElementById('edit-status').textContent = '';
+
+      const field = (id, label, val, tag = 'textarea', rows = 3) => {
+        const input = tag === 'input'
+          ? `<input type="text" id="ef-${id}" value="${_escAttr(val)}">`
+          : `<textarea id="ef-${id}" rows="${rows}">${_escText(val)}</textarea>`;
+        return `<div class="edit-field"><label>${label}</label>${input}</div>`;
+      };
+
+      let html = '';
+      if (editType === 'additions') {
+        html += field('badge',   'Badge label',     current.badge   || '', 'input');
+        html += field('content', 'Content (HTML)',  current.content || '', 'textarea', 10);
+      } else {
+        html += field('label',          'Panel label',      current.label          || '', 'input');
+        html += field('bcMinorSummary', 'BC Minor summary',  current.bcMinorSummary || '', 'textarea', 3);
+        html += field('tabaSummary',    'Division summary',  current.tabaSummary    || '', 'textarea', 3);
+        html += field('content',        'Content (HTML)',    current.content        || '', 'textarea', 8);
+      }
+
+      document.getElementById('edit-fields').innerHTML = html;
+      document.getElementById('edit-drawer').style.display = '';
+      document.getElementById('edit-drawer').scrollTop = 0;
+    };
+
+    function closeEditDrawer() {
+      document.getElementById('edit-drawer').style.display = 'none';
+      _editCtx = null;
+    }
+
+    async function saveEdit() {
+      if (!_editCtx) return;
+      const { divKey, sectionType, sectionId } = _editCtx;
+      const changes = {};
+      ['badge', 'label', 'content', 'bcMinorSummary', 'tabaSummary'].forEach(f => {
+        const el = document.getElementById('ef-' + f);
+        if (el) changes[f] = el.value;
+      });
+
+      const statusEl = document.getElementById('edit-status');
+      statusEl.textContent = 'Saving…';
+      try {
+        const res = await fetch('/api/save-amendment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_adminToken()}` },
+          body: JSON.stringify({ divisionKey: divKey, sectionType, sectionId, changes })
+        });
+        if (res.ok) {
+          statusEl.textContent = '✓ Saved — reloading…';
+          setTimeout(() => location.reload(), 700);
+        } else {
+          const d = await res.json().catch(() => ({}));
+          statusEl.textContent = `Error: ${d.error || res.status}`;
+        }
+      } catch { statusEl.textContent = 'Connection error.'; }
+    }
+
+    async function revertEdit() {
+      if (!_editCtx) return;
+      if (!confirm('Remove all amendments to this rule and restore the original wording?')) return;
+      const { divKey, sectionType, sectionId } = _editCtx;
+      const statusEl = document.getElementById('edit-status');
+      statusEl.textContent = 'Reverting…';
+      try {
+        const res = await fetch('/api/revert-amendment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${_adminToken()}` },
+          body: JSON.stringify({ divisionKey: divKey, sectionType, sectionId })
+        });
+        if (res.ok) {
+          statusEl.textContent = '✓ Reverted — reloading…';
+          setTimeout(() => location.reload(), 700);
+        } else {
+          const d = await res.json().catch(() => ({}));
+          statusEl.textContent = `Error: ${d.error || res.status}`;
+        }
+      } catch { statusEl.textContent = 'Connection error.'; }
+    }
   </script>
 
   <script src="js/bc-minor-rules.js"
@@ -47,12 +245,12 @@
 
   <script>
     try {
-      if (!window._loaded.rules)    { showError('bc-minor-rules.js did not load'); }
-      else if (!window._loaded.divisions) { showError('taba-divisions.js did not load'); }
-      else if (!window._loaded.renderer)  { showError('renderer.js did not load'); }
-      else if (!window.BCMinorRules)      { showError('BCMinorRules is not defined — bc-minor-rules.js may have a syntax error'); }
-      else if (!window.TABADivisions)     { showError('TABADivisions is not defined — taba-divisions.js may have a syntax error'); }
-      else if (!window.Rulebook)          { showError('Rulebook is not defined — renderer.js may have a syntax error'); }
+      if (!window._loaded.rules)           { showError('bc-minor-rules.js did not load'); }
+      else if (!window._loaded.divisions)  { showError('taba-divisions.js did not load'); }
+      else if (!window._loaded.renderer)   { showError('renderer.js did not load'); }
+      else if (!window.BCMinorRules)       { showError('BCMinorRules is not defined — bc-minor-rules.js may have a syntax error'); }
+      else if (!window.TABADivisions)      { showError('TABADivisions is not defined — taba-divisions.js may have a syntax error'); }
+      else if (!window.Rulebook)           { showError('Rulebook is not defined — renderer.js may have a syntax error'); }
       else {
         var params   = new URLSearchParams(window.location.search);
         var division = params.get('division');

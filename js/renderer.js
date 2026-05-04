@@ -94,6 +94,18 @@ window.Rulebook = (() => {
           </div>`;
       }).join('');
 
+    const adminCard = window.isAdminMode
+      ? `<a href="/admin" class="division-card admin-landing-card admin-landing-active" style="--division-color:#1a6b3a">
+           <span class="dc-badge" style="background:#1a6b3a">⚙ Admin</span>
+           <span class="dc-name">Audit Log</span>
+           <span class="dc-desc">Admin mode active — click to view audit log</span>
+         </a>`
+      : `<button class="division-card admin-landing-card" onclick="window.openAdminModal()" style="--division-color:#2c3e50">
+           <span class="dc-badge" style="background:#2c3e50">🔒 Admin</span>
+           <span class="dc-name">Rule Editor</span>
+           <span class="dc-desc">Authorized administrators only</span>
+         </button>`;
+
     app.innerHTML = `
       <div class="landing">
         <div class="landing-logo">⚾</div>
@@ -101,6 +113,10 @@ window.Rulebook = (() => {
         <p class="landing-sub">Tsawwassen Baseball Association</p>
         ${errorMsg ? `<p style="color:#ff8080;font-size:.85rem;margin-bottom:1.5rem;">${errorMsg}</p>` : ''}
         ${groupHTML}
+        <div class="landing-group">
+          <h3 class="landing-group-label">Administration</h3>
+          <div class="division-grid">${adminCard}</div>
+        </div>
         <p class="landing-footer">BC Minor Baseball Association · bcminorbaseball.org<br>Providing Canadian Youth Baseball Programs Since 1963</p>
       </div>`;
     document.title = 'TABA Rulebook 2026';
@@ -349,10 +365,14 @@ window.Rulebook = (() => {
     } else {
       body = `<div class="panel-removes">${override.content || ''}</div>`;
     }
+    const editBtn = window.isAdminMode
+      ? `<button class="edit-btn dp-edit-btn" data-edit-type="overrides" data-edit-id="${ruleId}" data-div-key="${currentDivision}" title="Edit this override">✎ Edit</button>`
+      : '';
     return `
       <div class="division-panel dp-open" style="--division-color:${divisionData.color}">
         <div class="division-panel-header" onclick="Rulebook.togglePanel(this)">
           <span class="dp-label">${icon} ${label}</span>
+          ${editBtn}
           <span class="dp-chev">▼</span>
         </div>
         <div class="division-panel-body">${body}${buildAmendmentAttr(override._meta)}</div>
@@ -368,13 +388,19 @@ window.Rulebook = (() => {
   }
 
   function buildAddition(addition) {
+    const editBtn = window.isAdminMode
+      ? `<button class="edit-btn" data-edit-type="additions" data-edit-id="${addition.id}" data-div-key="${currentDivision}" title="Edit this rule">✎ Edit</button>`
+      : '';
     return `
       <div class="taba-rule-section r-open" id="${addition.id}" style="--division-color:${divisionData.color}">
-        <button class="taba-rule-toggle" onclick="Rulebook.toggleRule(this, true)">
-          <span class="taba-rule-num">${addition.badge || divisionData.badge}</span>
-          <span class="taba-rule-title">${addition.title}</span>
-          <span class="taba-rule-chev">▼</span>
-        </button>
+        <div class="taba-rule-header">
+          <button class="taba-rule-toggle" onclick="Rulebook.toggleRule(this, true)">
+            <span class="taba-rule-num">${addition.badge || divisionData.badge}</span>
+            <span class="taba-rule-title">${addition.title}</span>
+            <span class="taba-rule-chev">▼</span>
+          </button>
+          ${editBtn}
+        </div>
         <div class="taba-rule-body">${addition.content || ''}${buildAmendmentAttr(addition._meta)}</div>
       </div>`;
   }
@@ -554,6 +580,15 @@ window.Rulebook = (() => {
     // BC Minor rule cross-links inside content (class="bcm-link")
     // These are rendered inside innerHTML so we use event delegation on #main
     document.getElementById('main').addEventListener('click', e => {
+      // Edit button
+      const editBtn = e.target.closest('.edit-btn');
+      if (editBtn && window.openEditDrawer) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.openEditDrawer(editBtn.dataset);
+        return;
+      }
+      // bcm-link
       const link = e.target.closest('a.bcm-link[href^="#"]');
       if (!link) return;
       e.preventDefault();

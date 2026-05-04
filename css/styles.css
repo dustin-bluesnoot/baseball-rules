@@ -563,6 +563,146 @@ footer {
 }
 footer a { color: var(--gold); text-decoration: none; }
 
+/* ════════════════════════════════════════════════════════════
+   Admin mode
+   ════════════════════════════════════════════════════════════ */
+
+/* Admin banner */
+#admin-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  height: 38px;
+  background: #1a2a1a; color: #7dbb7d;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1rem; font-size: .78rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+.admin-banner-left  { display: flex; align-items: center; gap: .5rem; }
+.admin-banner-right { display: flex; align-items: center; gap: .75rem; }
+.admin-banner-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #4caf50; box-shadow: 0 0 6px #4caf50; flex-shrink: 0;
+}
+.admin-banner-sep { margin: 0 .15rem; opacity: .5; }
+.admin-banner-link {
+  color: #9fd89f; text-decoration: none; font-size: .75rem;
+  border: 1px solid rgba(159,216,159,.3); border-radius: 3px;
+  padding: .15rem .5rem;
+}
+.admin-banner-link:hover { background: rgba(159,216,159,.1); }
+.admin-banner-logout {
+  background: rgba(255,100,100,.15); color: #ff9999;
+  border: 1px solid rgba(255,100,100,.3); border-radius: 3px;
+  padding: .15rem .6rem; font-size: .75rem; cursor: pointer;
+}
+.admin-banner-logout:hover { background: rgba(255,100,100,.25); }
+body.admin-mode { padding-top: 38px; }
+
+/* Admin login modal */
+#admin-modal {
+  position: fixed; inset: 0; z-index: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+.admin-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.65); }
+.admin-modal-box {
+  position: relative; z-index: 1;
+  background: #fff; border-radius: 12px;
+  padding: 2rem 1.75rem; width: 320px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.4);
+  text-align: center;
+}
+.admin-modal-close {
+  position: absolute; top: .75rem; right: .75rem;
+  background: none; border: none; font-size: 1.1rem; color: #999; cursor: pointer;
+}
+.admin-modal-close:hover { color: #333; }
+.admin-modal-icon { font-size: 2.2rem; margin-bottom: .75rem; }
+.admin-modal-box h2 { font-size: 1.15rem; margin-bottom: .35rem; }
+.admin-modal-box p  { font-size: .82rem; color: #666; margin-bottom: 1.25rem; line-height: 1.5; }
+.admin-modal-box input[type="password"] {
+  width: 100%; border: 1px solid #c9d0df; border-radius: 6px;
+  padding: .55rem .75rem; font-size: .9rem; margin-bottom: .65rem; background: #fafbfd;
+}
+.admin-modal-box input[type="password"]:focus {
+  outline: none; border-color: #2c3e50; box-shadow: 0 0 0 3px rgba(44,62,80,.1);
+}
+.admin-modal-box button[type="submit"] {
+  width: 100%; background: #2c3e50; color: #fff; border: none;
+  border-radius: 6px; padding: .6rem; font-size: .9rem; font-weight: 600; cursor: pointer;
+}
+.admin-modal-box button[type="submit"]:hover:not(:disabled) { background: #3d5166; }
+.admin-modal-box button[type="submit"]:disabled { opacity: .55; cursor: default; }
+.admin-modal-err { color: #c0392b; font-size: .8rem; margin-top: .6rem; font-weight: 600; }
+
+/* Admin landing card */
+.admin-landing-card { cursor: pointer; border: none; text-align: left; font-family: inherit; }
+
+/* Edit button (pencil) */
+.edit-btn {
+  display: inline-flex; align-items: center; gap: .25rem;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(0,0,0,.2); border-radius: 4px;
+  padding: .2rem .55rem; font-size: .7rem; font-weight: 600;
+  color: #2c3e50; cursor: pointer; font-family: inherit;
+  white-space: nowrap; flex-shrink: 0;
+  transition: background .12s, border-color .12s;
+}
+.edit-btn:hover { background: #fff; border-color: #2c3e50; }
+.dp-edit-btn { margin-left: auto; margin-right: .5rem; }
+
+/* TABA rule header row (toggle button + edit button) */
+.taba-rule-header { display: flex; align-items: stretch; }
+.taba-rule-header .taba-rule-toggle { flex: 1; }
+.taba-rule-header .edit-btn { align-self: center; margin: .4rem .5rem .4rem 0; }
+
+/* Edit drawer */
+#edit-drawer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 490;
+  background: #fff; border-top: 3px solid #2c3e50;
+  max-height: 65vh; overflow-y: auto;
+  box-shadow: 0 -6px 24px rgba(0,0,0,.18);
+}
+.edit-drawer-header {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  background: #2c3e50; color: #fff; padding: .6rem 1rem;
+}
+.edit-drawer-title-row { display: flex; align-items: baseline; gap: .5rem; font-size: .85rem; }
+.edit-drawer-label { opacity: .6; font-size: .75rem; }
+.edit-drawer-close {
+  background: none; border: none; color: rgba(255,255,255,.7); font-size: 1rem; cursor: pointer;
+}
+.edit-drawer-close:hover { color: #fff; }
+.edit-drawer-body { padding: 1rem 1.25rem 1.5rem; }
+.edit-field { margin-bottom: 1rem; }
+.edit-field label {
+  display: block; font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em; color: #555; margin-bottom: .3rem;
+}
+.edit-field input, .edit-field textarea {
+  width: 100%; border: 1px solid #c9d0df; border-radius: 5px;
+  padding: .45rem .6rem; font-family: 'DM Mono', monospace;
+  font-size: .8rem; color: #1a1a2e; background: #fafbfd; resize: vertical;
+}
+.edit-field input:focus, .edit-field textarea:focus {
+  outline: none; border-color: #2c3e50; box-shadow: 0 0 0 3px rgba(44,62,80,.08);
+}
+.edit-drawer-actions {
+  display: flex; align-items: center; gap: .75rem;
+  padding-top: .75rem; border-top: 1px solid #eee; flex-wrap: wrap;
+}
+.edit-save-btn {
+  background: #27ae60; color: #fff; border: none; border-radius: 5px;
+  padding: .5rem 1.25rem; font-weight: 700; font-size: .85rem; cursor: pointer;
+}
+.edit-save-btn:hover { background: #219a52; }
+.edit-revert-btn {
+  background: #fff; color: #c0392b;
+  border: 1px solid rgba(192,57,43,.4); border-radius: 5px;
+  padding: .5rem 1rem; font-size: .85rem; cursor: pointer;
+}
+.edit-revert-btn:hover { background: #fff4f4; }
+.edit-status-msg { font-size: .8rem; color: #555; }
+
 /* ── Responsive ── */
 @media print {
   #sidebar { display: none; }
