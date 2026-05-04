@@ -130,7 +130,7 @@
 
     /* ── Edit drawer ──────────────────────────────── */
     let _editCtx = null;
-    let _quillInstance = null;
+    let _ceEditor = null;
     let _editorMode = 'code';
 
     function _escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -192,46 +192,33 @@
           <div class="editor-preview-live" id="ef-content-preview">${val}</div>
         </div>
         <div id="ef-visual-section" style="display:none">
-          <div id="ef-quill-mount"><p class="editor-loading">Click "Visual" to load the rich text editor…</p></div>
+          <div id="ef-visual-mount"><p class="editor-loading">Click "Visual" to load the rich text editor…</p></div>
         </div>
       </div>`;
     }
 
-    function _ensureQuillLoaded() {
-      return new Promise(resolve => {
-        if (window.Quill) { resolve(); return; }
-        if (!document.getElementById('quill-css')) {
-          const l = document.createElement('link');
-          l.id = 'quill-css'; l.rel = 'stylesheet';
-          l.href = 'https://cdn.quilljs.com/1.3.7/quill.snow.css';
-          document.head.appendChild(l);
-        }
-        const s = document.createElement('script');
-        s.src = 'https://cdn.quilljs.com/1.3.7/quill.min.js';
-        s.onload = resolve;
-        document.head.appendChild(s);
-      });
+    function _initVisualEditor(html) {
+      const mount = document.getElementById('ef-visual-mount');
+      if (!mount) return;
+      mount.innerHTML = `
+        <div class="ve-toolbar">
+          <button type="button" class="ve-btn" onmousedown="event.preventDefault();document.execCommand('bold')"><strong>B</strong></button>
+          <button type="button" class="ve-btn" onmousedown="event.preventDefault();document.execCommand('italic')"><em>I</em></button>
+          <button type="button" class="ve-btn" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')">• List</button>
+          <button type="button" class="ve-btn" onmousedown="event.preventDefault();document.execCommand('insertOrderedList')">1. List</button>
+          <span class="tb-sep"></span>
+          <button type="button" class="ve-btn ve-btn-warn" onmousedown="event.preventDefault()" onclick="_syncVisualToCode()" title="Copy current visual HTML back to code editor">Sync → Code</button>
+        </div>
+        <div id="ef-visual-editor" class="ve-content" contenteditable="true" spellcheck="false"></div>
+        <p class="editor-loading" style="margin-top:.4rem;font-size:.75rem">Visual mode preserves all HTML. Use Code mode for callouts, tables, and badges.</p>`;
+      _ceEditor = document.getElementById('ef-visual-editor');
+      _ceEditor.innerHTML = html;
     }
 
-    async function _initQuill(html) {
-      const mount = document.getElementById('ef-quill-mount');
-      if (!mount) return;
-      mount.innerHTML = '<p class="editor-loading">Loading visual editor…</p>';
-      await _ensureQuillLoaded();
-      mount.innerHTML = '<div id="ef-quill-editor"></div>';
-      _quillInstance = new Quill('#ef-quill-editor', {
-        theme: 'snow',
-        modules: {
-          toolbar: [
-            ['bold', 'italic', 'underline'],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            ['link', 'blockquote'],
-            ['clean']
-          ],
-          clipboard: { matchVisual: false }
-        }
-      });
-      _quillInstance.root.innerHTML = html;
+    function _syncVisualToCode() {
+      if (!_ceEditor) return;
+      const ta = document.getElementById('ef-content');
+      if (ta) { ta.value = _ceEditor.innerHTML; ta.dispatchEvent(new Event('input')); }
     }
 
     function _attachEditorHandlers() {
@@ -252,7 +239,7 @@
 
       // Mode toggle
       document.querySelectorAll('#edit-fields .mode-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
+        btn.addEventListener('click', () => {
           const mode = btn.dataset.mode;
           if (mode === _editorMode) return;
           document.querySelectorAll('#edit-fields .mode-btn').forEach(b => b.classList.remove('active'));
@@ -261,9 +248,9 @@
           if (mode === 'visual') {
             document.getElementById('ef-code-section').style.display = 'none';
             document.getElementById('ef-visual-section').style.display = '';
-            await _initQuill(ta.value);
+            _initVisualEditor(ta.value);
           } else {
-            if (_quillInstance) { ta.value = _quillInstance.root.innerHTML; ta.dispatchEvent(new Event('input')); }
+            if (_ceEditor) { ta.value = _ceEditor.innerHTML; ta.dispatchEvent(new Event('input')); }
             document.getElementById('ef-visual-section').style.display = 'none';
             document.getElementById('ef-code-section').style.display = '';
           }
@@ -313,14 +300,14 @@
 
     function closeEditDrawer() {
       document.getElementById('edit-drawer').style.display = 'none';
-      _editCtx = null; _quillInstance = null; _editorMode = 'code';
+      _editCtx = null; _ceEditor = null; _editorMode = 'code';
     }
 
     async function saveEdit() {
       if (!_editCtx) return;
-      if (_editorMode === 'visual' && _quillInstance) {
+      if (_editorMode === 'visual' && _ceEditor) {
         const ta = document.getElementById('ef-content');
-        if (ta) ta.value = _quillInstance.root.innerHTML;
+        if (ta) ta.value = _ceEditor.innerHTML;
       }
       const { divKey, sectionType, sectionId } = _editCtx;
       const changes = {};
