@@ -9,9 +9,12 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end('Method Not Allowed');
   try {
     const amendments = await redis.get('amendments') || {};
-    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
+    const count = Object.keys(amendments).length;
+    console.log(`[amendments] returning ${count} division(s) with amendments`);
+    res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json(amendments);
-  } catch {
+  } catch (err) {
+    console.error('[amendments] Redis error:', err.message);
     return res.status(200).json({});
   }
 };
