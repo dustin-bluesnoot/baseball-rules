@@ -13,5 +13,6 @@ module.exports = async function handler(req, res) {
   }
 
   const auditLog = await redis.get('audit_log') || [];
+  res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json(auditLog);
 };

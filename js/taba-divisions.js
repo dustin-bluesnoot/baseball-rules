@@ -31,7 +31,7 @@ window.TABADivisions = {
     badge: "11U Mosquito",
     color: "#0c413b",
     group: "taba",
-    description: "Spring & Summer 2026 · TABA Local Rules",
+    description: "TABA Home/Host Rules · Spring & Summer 2026",
 
     overrides: {
 
@@ -44,7 +44,7 @@ window.TABADivisions = {
           <table>
             <thead><tr><th>Innings</th><th>Run Limit (TABA 11U)</th><th>Out Limit</th></tr></thead>
             <tbody>
-              <tr><td class="hi">1–2</td><td>2 runs maximum <span class="sb-badge badge-taba">TABA only</span></td><td>3 outs</td></tr>
+              <tr><td class="hi">1–2</td><td>2 runs maximum <span class="sb-badge badge-taba">TABA Home/Host Rule</span></td><td>3 outs</td></tr>
               <tr><td class="hi">3–5</td><td>4 runs maximum</td><td>3 outs</td></tr>
               <tr><td class="hi">6 (or last)</td><td>Open — no run limit</td><td>3 outs only</td></tr>
             </tbody>
@@ -61,36 +61,60 @@ window.TABADivisions = {
 
     additions: [
       {
-        id: "taba-11u-first-year-pitcher",
-        insertAfterRule: "24",
-        title: "First-Year Pitcher Rule",
-        badge: "TABA 11U Only",
+        id: "taba-11u-precedence",
+        insertAfterRule: "1",
+        title: "11U Rule Scope & Precedence",
+        badge: "TABA Home/Host Rule",
         content: `
           <div class="callout blue">
-            <p>The <strong>first two innings of each game must be pitched by a first-year player</strong> — defined as a player who did not play in the 11U Division in a previous year, and who is eligible to play one more year in 11U.</p>
+            <p>These rules apply when <strong>TABA is the home association or tournament host</strong>. For away games, check the host association's published local rules first.</p>
           </div>
-          <p>A second-year player may not pitch until inning three or later.</p>
-          <p class="note">This rule has no equivalent in BC Minor Baseball. It is a TABA-specific development rule designed to give first-year players pitching experience.</p>`
+          <div class="callout navy">
+            <p><strong>Order of Precedence (highest to lowest):</strong></p>
+            <ol class="nl">
+              <li><strong>Home/Host Association Local Rules</strong> — TABA rules at Tsawwassen/TABA tournaments; the host association's local rules at away games</li>
+              <li><strong>Fraser Delta Interlock Rules</strong> — where applicable, if no host local rule covers the situation</li>
+              <li><strong>BC Minor Baseball Rules</strong> — where the above are silent</li>
+              <li><strong>Official Rules of Baseball</strong> — where BC Minor is silent</li>
+            </ol>
+          </div>`
+      },
+      {
+        id: "taba-11u-first-year-pitcher",
+        insertAfterRule: "24",
+        title: "First-Year or Under-Aged Pitcher Rule",
+        badge: "Fraser Delta Interlock",
+        content: `
+          <div class="callout blue">
+            <p>The <strong>first two innings of each game must be pitched by a first-year or under-aged player</strong>.</p>
+          </div>
+          <p><strong>Age definitions for this rule:</strong></p>
+          <ul class="rl">
+            <li><strong>First-year player</strong> — a player who did not play in the 11U Division in a previous year and is eligible to play one more year at 11U.</li>
+            <li><strong>Under-aged player</strong> — a player who is playing 11U below the standard age (i.e., is age-eligible for a younger division but has been moved up).</li>
+            <li><strong>Second-year player</strong> — a player in their final year of 11U eligibility.</li>
+          </ul>
+          <p>Any eligible player may pitch from inning 3 onward, subject to pitch count rules under <a href="#rule-24" class="bcm-link">BC Minor Rule 24</a>.</p>`
       },
       {
         id: "taba-11u-stealing-home",
         insertAfterRule: "26",
-        title: "11U Base Running — No Stealing Home (Innings 1–2)",
-        badge: "TABA 11U Only",
+        title: "11U Base Running — Stealing Home",
+        badge: "Fraser Delta Interlock",
         content: `
-          <div class="callout red"><p><strong>No stealing of home is allowed in the first two (2) innings.</strong></p></div>
-          <p>The only two ways a player can score in innings 1 and 2:</p>
+          <div class="callout red"><p><strong>No stealing of home is allowed in the first two (2) innings until May 1.</strong></p></div>
+          <p><strong>Before May 1:</strong> A runner may only score from third base in innings 1 and 2 by:</p>
           <ul class="rl">
             <li>Being forced home by a walk, hit batter, or catcher interference.</li>
             <li>The continuation of a play that began with a hit ball.</li>
           </ul>
-          <p>From inning 3 onward, stealing home is permitted subject to all other base running rules including the <a href="#26-09" class="bcm-link">leadoff rule (BC Minor 26.09)</a>.</p>`
+          <p><strong>Starting May 1:</strong> Stealing home is permitted in any inning, subject to all normal base running rules including the <a href="#26-09" class="bcm-link">leadoff rule (BC Minor 26.09)</a>.</p>`
       },
       {
         id: "taba-11u-coaches",
         insertAfterRule: "10",
         title: "11U Coaches — On-Field Rules",
-        badge: "TABA 11U Only",
+        badge: "TABA Home/Host Rule",
         content: `
           <ul class="rl">
             <li>Maximum <strong>three (3) coaches</strong> inside the fenced perimeter during game play.</li>
@@ -103,19 +127,21 @@ window.TABADivisions = {
         id: "taba-11u-home-team",
         insertAfterRule: "22",
         title: "11U Home Team Responsibilities",
-        badge: "TABA 11U Only",
+        badge: "TABA Home/Host Rule",
         content: `
           <ul class="rl">
+            <li><strong>Home team occupies the dugout behind third base.</strong></li>
             <li>Notify the umpire allocator, concession manager, and 11U Division Manager of any game cancellations, postponements, or rescheduling.</li>
             <li>Prepare the diamond: line the field and fill depressions before the game. After the game, return all equipment to bins and lock up.</li>
-            <li>Bring <strong>two provided game balls</strong> to the umpire at the start of each game.</li>
+            <li>Bring <strong>two new game balls</strong> to the umpire at the start of each game.</li>
+            <li><strong>Home team's scorekeeper is the official scorekeeper</strong> for the game.</li>
           </ul>`
       },
       {
         id: "taba-11u-9u-callup",
         insertAfterRule: "5",
         title: "11U — Use of 9U (Tadpole) Players",
-        badge: "TABA 11U Only",
+        badge: "TABA Home/Host Rule",
         content: `
           <div class="callout red">
             <p><a href="#5-06" class="bcm-link">BC Minor Rule 5.06</a> limits 9U call-ups to <strong>5 regular season games plus one tournament</strong> per player per season.</p>
@@ -126,6 +152,39 @@ window.TABADivisions = {
             <li>Tadpole players must wear their regular team uniform when playing 11U games.</li>
             <li>Tadpole players are <strong>not allowed to pitch</strong> in 11U games.</li>
           </ul>`
+      },
+      {
+        id: "taba-11u-game-length",
+        insertAfterRule: "22",
+        title: "11U — Game Length & Time Limit",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <div class="callout blue">
+            <p><strong>No time limit applies to TABA 11U regular season games.</strong> The umpire may end the game due to darkness or unsafe field conditions at their discretion.</p>
+          </div>
+          <ul class="rl">
+            <li>All TABA 11U regular season games are <strong>6 innings</strong>, subject to the mercy rule (<a href="#22-08" class="bcm-link">BC Minor Rule 22.08</a>).</li>
+            <li><a href="#22-07" class="bcm-link">BC Minor Rule 22.07</a> imposes a 2-hour limit at 11U Provincial Championships only — it does not apply to TABA regular season games.</li>
+          </ul>`
+      },
+      {
+        id: "taba-11u-fair-play",
+        insertAfterRule: "25",
+        title: "11U — Fair Play Rule",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <p>TABA 11U follows <a href="#rule-25" class="bcm-link">BC Minor Rule 25</a> in full. No TABA-specific modifications apply.</p>
+          <div class="callout red">
+            <p><strong>Failure to adhere to the Fair Play Rule</strong> results in a minimum game forfeiture and a minimum five-game suspension for the coach in charge (<a href="#25-00" class="bcm-link">Rule 25.00</a>).</p>
+          </div>
+          <div class="sub-rule">
+            <div class="sub-rule-title">Spring — <a href="#25-01" class="bcm-link">Rule 25.01</a></div>
+            <p>All players in attendance at league games must play at least <strong>three (3) complete innings</strong> of a six-inning game.</p>
+          </div>
+          <div class="sub-rule">
+            <div class="sub-rule-title">Summer — <a href="#25-02" class="bcm-link">Rule 25.02</a></div>
+            <p>No player may sit out for <strong>two consecutive innings</strong>. Upon re-entering defensively (except as pitcher), the player must complete one full defensive inning comprised of 3 outs or the opponent reaching the run maximum.</p>
+          </div>`
       }
     ]
   },
@@ -213,14 +272,17 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "13U A Interlock",
         content: `
-          <div class="callout red">
+          <div class="callout blue">
+            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local or home rule for the situation.</p>
+          </div>
+          <div class="callout navy">
             <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li>Fraser Delta Interlock Rules</li>
-              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
-              <li>Official Rules of Baseball</li>
+              <li><strong>Home/Host Association Local Rules</strong> — the host association's published local rules take priority at their home fields</li>
+              <li><strong>Fraser Delta Interlock Rules</strong> — where no host local rule covers the situation</li>
+              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — where the above are silent</li>
+              <li><strong>Official Rules of Baseball</strong> — where BC Minor is silent</li>
             </ol>
-            <p>Where the Interlock Rules are silent, BC Minor rules apply. Where BC Minor rules are silent, the Official Rules of Baseball apply.</p>
           </div>
           <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
@@ -286,8 +348,7 @@ window.TABADivisions = {
         title: "13U A — Umpires",
         badge: "13U A Interlock",
         content: `
-          <p>The <strong>home team is responsible for supplying umpires</strong> for all interlock games. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> for general umpire conduct and authority.</p>
-          <p>Acceptable behavior for interacting with umpires is defined in <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
+          <p>The <strong>home team is responsible for supplying umpires</strong> for all interlock games. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
       },
       {
         id: "fdi-13ua-playoffs",
@@ -424,21 +485,27 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "13U AA Interlock",
         content: `
-          <div class="callout red">
+          <div class="callout blue">
+            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local or home rule for the situation.</p>
+          </div>
+          <div class="callout navy">
             <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li>Fraser Delta Interlock Rules</li>
-              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
-              <li>Official Rules of Baseball</li>
+              <li><strong>Home/Host Association Local Rules</strong> — the host association's published local rules take priority at their home fields</li>
+              <li><strong>Fraser Delta Interlock Rules</strong> — where no host local rule covers the situation</li>
+              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — where the above are silent</li>
+              <li><strong>Official Rules of Baseball</strong> — where BC Minor is silent</li>
             </ol>
           </div>
+          <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
             <thead><tr><th>Contact</th><th>Role</th><th>Email</th></tr></thead>
             <tbody>
-              <tr><td>Steve Ormston</td><td>Website Coordinator</td><td>scheduler@ndbaseball.com</td></tr>
+              <tr><td>Steve Ormston</td><td>Website Coordinator (scores/standings)</td><td>scheduler@ndbaseball.com</td></tr>
               <tr><td>Brent Dingsdale</td><td>Interlock Coordinator</td><td>coaching@ndbaseball.com</td></tr>
             </tbody>
-          </table>`
+          </table>
+          <p>Schedule and standings are hosted at <strong>ndbaseball.com</strong> (SportsEngine).</p>`
       },
       {
         id: "fdi-13uaa-schedule",
@@ -502,7 +569,7 @@ window.TABADivisions = {
         insertAfterRule: "17",
         title: "13U AA — Umpires",
         badge: "13U AA Interlock",
-        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> for general umpire authority. Acceptable behavior for interacting with umpires is defined in <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
+        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
       },
       {
         id: "fdi-13uaa-playoffs",
@@ -603,21 +670,27 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "15U A Interlock",
         content: `
-          <div class="callout red">
+          <div class="callout blue">
+            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local or home rule for the situation.</p>
+          </div>
+          <div class="callout navy">
             <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li>Fraser Delta Interlock Rules</li>
-              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
-              <li>Official Rules of Baseball</li>
+              <li><strong>Home/Host Association Local Rules</strong> — the host association's published local rules take priority at their home fields</li>
+              <li><strong>Fraser Delta Interlock Rules</strong> — where no host local rule covers the situation</li>
+              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — where the above are silent</li>
+              <li><strong>Official Rules of Baseball</strong> — where BC Minor is silent</li>
             </ol>
           </div>
+          <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
             <thead><tr><th>Contact</th><th>Role</th><th>Email</th></tr></thead>
             <tbody>
-              <tr><td>Steve Ormston</td><td>Website Coordinator</td><td>scheduler@ndbaseball.com</td></tr>
+              <tr><td>Steve Ormston</td><td>Website Coordinator (scores/standings)</td><td>scheduler@ndbaseball.com</td></tr>
               <tr><td>Brent Dingsdale</td><td>Interlock Coordinator</td><td>coaching@ndbaseball.com</td></tr>
             </tbody>
-          </table>`
+          </table>
+          <p>Schedule and standings are hosted at <strong>ndbaseball.com</strong> (SportsEngine).</p>`
       },
       {
         id: "fdi-15ua-schedule",
@@ -667,7 +740,7 @@ window.TABADivisions = {
         insertAfterRule: "17",
         title: "15U A — Umpires",
         badge: "15U A Interlock",
-        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> and <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
+        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
       },
       {
         id: "fdi-15ua-playoffs",
@@ -784,21 +857,27 @@ window.TABADivisions = {
         title: "Fraser Delta Interlock — Overview & Order of Precedence",
         badge: "18U AA Interlock",
         content: `
-          <div class="callout red">
+          <div class="callout blue">
+            <p>These rules apply to Fraser Delta Interlock play unless the host association has a published local or home rule for the situation.</p>
+          </div>
+          <div class="callout navy">
             <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
-              <li>Fraser Delta Interlock Rules</li>
-              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></li>
-              <li>Official Rules of Baseball</li>
+              <li><strong>Home/Host Association Local Rules</strong> — the host association's published local rules take priority at their home fields</li>
+              <li><strong>Fraser Delta Interlock Rules</strong> — where no host local rule covers the situation</li>
+              <li><strong><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a></strong> — where the above are silent</li>
+              <li><strong>Official Rules of Baseball</strong> — where BC Minor is silent</li>
             </ol>
           </div>
+          <p>The Fraser Delta Interlock schedules and administers regular season and playoff games and standings for 13U A and AA, 15U A, and 18U AA divisions.</p>
           <table>
             <thead><tr><th>Contact</th><th>Role</th><th>Email</th></tr></thead>
             <tbody>
-              <tr><td>Steve Ormston</td><td>Website Coordinator</td><td>scheduler@ndbaseball.com</td></tr>
+              <tr><td>Steve Ormston</td><td>Website Coordinator (scores/standings)</td><td>scheduler@ndbaseball.com</td></tr>
               <tr><td>Brent Dingsdale</td><td>Interlock Coordinator</td><td>coaching@ndbaseball.com</td></tr>
             </tbody>
-          </table>`
+          </table>
+          <p>Schedule and standings are hosted at <strong>ndbaseball.com</strong> (SportsEngine).</p>`
       },
       {
         id: "fdi-18uaa-schedule",
@@ -859,7 +938,7 @@ window.TABADivisions = {
         insertAfterRule: "17",
         title: "18U AA — Umpires",
         badge: "18U AA Interlock",
-        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Refer to <a href="#rule-17" class="bcm-link">BC Minor Rule 17</a> and <a href="#rule-13" class="bcm-link">BC Minor Rule 13</a>.</p>`
+        content: `<p>The <strong>home team is responsible for supplying umpires</strong>. Umpire interaction during Fraser Delta Interlock play is governed by <a href="#13-02" class="bcm-link">BC Minor Rule 13.02</a>. Violations of umpire interaction rules may result in ejection or suspension per applicable conduct provisions.</p>`
       },
       {
         id: "fdi-18uaa-playoffs",
