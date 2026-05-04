@@ -130,6 +130,8 @@
 
     /* ── Edit drawer ──────────────────────────────── */
     let _editCtx = null;
+    let _quillInstance = null;
+    let _editorMode = 'code';
 
     function _escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function _escText(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -163,37 +165,108 @@
 
     function _contentField(val) {
       return `<div class="edit-field">
-        <label>Content (HTML)</label>
-        <div class="editor-toolbar">
-          <button type="button" class="tb-btn" data-wrap-b="&lt;strong&gt;" data-wrap-a="&lt;/strong&gt;">Bold</button>
-          <button type="button" class="tb-btn" data-wrap-b="&lt;a href=&quot;#&quot; class=&quot;bcm-link&quot;&gt;" data-wrap-a="&lt;/a&gt;">BC Link</button>
-          <span class="tb-sep"></span>
-          <button type="button" class="tb-btn" data-snip="callout-blue">Callout blue</button>
-          <button type="button" class="tb-btn" data-snip="callout-red">Callout red</button>
-          <button type="button" class="tb-btn" data-snip="callout-navy">Callout navy</button>
-          <span class="tb-sep"></span>
-          <button type="button" class="tb-btn" data-snip="ul">Bullet list</button>
-          <button type="button" class="tb-btn" data-snip="ol">Numbered list</button>
-          <button type="button" class="tb-btn" data-snip="table">Table</button>
-          <span class="tb-sep"></span>
-          <button type="button" class="tb-btn" data-snip="sub-rule">Sub-rule</button>
-          <button type="button" class="tb-btn" data-snip="note">Note</button>
+        <label>Content (HTML)
+          <span class="editor-mode-bar">
+            <button type="button" class="mode-btn active" data-mode="code">Code</button>
+            <button type="button" class="mode-btn" data-mode="visual">Visual</button>
+          </span>
+        </label>
+        <div id="ef-code-section">
+          <div class="editor-toolbar">
+            <button type="button" class="tb-btn" data-wrap-b="&lt;strong&gt;" data-wrap-a="&lt;/strong&gt;">Bold</button>
+            <button type="button" class="tb-btn" data-wrap-b="&lt;a href=&quot;#&quot; class=&quot;bcm-link&quot;&gt;" data-wrap-a="&lt;/a&gt;">BC Link</button>
+            <span class="tb-sep"></span>
+            <button type="button" class="tb-btn" data-snip="callout-blue">Callout blue</button>
+            <button type="button" class="tb-btn" data-snip="callout-red">Callout red</button>
+            <button type="button" class="tb-btn" data-snip="callout-navy">Callout navy</button>
+            <span class="tb-sep"></span>
+            <button type="button" class="tb-btn" data-snip="ul">Bullet list</button>
+            <button type="button" class="tb-btn" data-snip="ol">Numbered list</button>
+            <button type="button" class="tb-btn" data-snip="table">Table</button>
+            <span class="tb-sep"></span>
+            <button type="button" class="tb-btn" data-snip="sub-rule">Sub-rule</button>
+            <button type="button" class="tb-btn" data-snip="note">Note</button>
+          </div>
+          <textarea id="ef-content" rows="10">${_escText(val)}</textarea>
+          <div class="editor-preview-label">Preview</div>
+          <div class="editor-preview-live" id="ef-content-preview">${val}</div>
         </div>
-        <textarea id="ef-content" rows="10">${_escText(val)}</textarea>
-        <div class="editor-preview-label">Preview</div>
-        <div class="editor-preview-live" id="ef-content-preview">${val}</div>
+        <div id="ef-visual-section" style="display:none">
+          <div id="ef-quill-mount"><p class="editor-loading">Click "Visual" to load the rich text editor…</p></div>
+        </div>
       </div>`;
+    }
+
+    function _ensureQuillLoaded() {
+      return new Promise(resolve => {
+        if (window.Quill) { resolve(); return; }
+        if (!document.getElementById('quill-css')) {
+          const l = document.createElement('link');
+          l.id = 'quill-css'; l.rel = 'stylesheet';
+          l.href = 'https://cdn.quilljs.com/1.3.7/quill.snow.css';
+          document.head.appendChild(l);
+        }
+        const s = document.createElement('script');
+        s.src = 'https://cdn.quilljs.com/1.3.7/quill.min.js';
+        s.onload = resolve;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function _initQuill(html) {
+      const mount = document.getElementById('ef-quill-mount');
+      if (!mount) return;
+      mount.innerHTML = '<p class="editor-loading">Loading visual editor…</p>';
+      await _ensureQuillLoaded();
+      mount.innerHTML = '<div id="ef-quill-editor"></div>';
+      _quillInstance = new Quill('#ef-quill-editor', {
+        theme: 'snow',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link', 'blockquote'],
+            ['clean']
+          ],
+          clipboard: { matchVisual: false }
+        }
+      });
+      _quillInstance.root.innerHTML = html;
     }
 
     function _attachEditorHandlers() {
       const ta = document.getElementById('ef-content');
       if (!ta) return;
       const preview = document.getElementById('ef-content-preview');
+
+      // Live preview in code mode
       ta.addEventListener('input', () => { preview.innerHTML = ta.value; });
-      document.querySelectorAll('#edit-fields .tb-btn').forEach(btn => {
+
+      // Toolbar snippet/wrap buttons
+      document.querySelectorAll('#ef-code-section .tb-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           if (btn.dataset.snip)  _insertSnippet(ta, _SNIPPETS[btn.dataset.snip] || '');
           if (btn.dataset.wrapB) _wrapSelection(ta, btn.dataset.wrapB.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'), btn.dataset.wrapA.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'));
+        });
+      });
+
+      // Mode toggle
+      document.querySelectorAll('#edit-fields .mode-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const mode = btn.dataset.mode;
+          if (mode === _editorMode) return;
+          document.querySelectorAll('#edit-fields .mode-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          _editorMode = mode;
+          if (mode === 'visual') {
+            document.getElementById('ef-code-section').style.display = 'none';
+            document.getElementById('ef-visual-section').style.display = '';
+            await _initQuill(ta.value);
+          } else {
+            if (_quillInstance) { ta.value = _quillInstance.root.innerHTML; ta.dispatchEvent(new Event('input')); }
+            document.getElementById('ef-visual-section').style.display = 'none';
+            document.getElementById('ef-code-section').style.display = '';
+          }
         });
       });
     }
@@ -240,11 +313,15 @@
 
     function closeEditDrawer() {
       document.getElementById('edit-drawer').style.display = 'none';
-      _editCtx = null;
+      _editCtx = null; _quillInstance = null; _editorMode = 'code';
     }
 
     async function saveEdit() {
       if (!_editCtx) return;
+      if (_editorMode === 'visual' && _quillInstance) {
+        const ta = document.getElementById('ef-content');
+        if (ta) ta.value = _quillInstance.root.innerHTML;
+      }
       const { divKey, sectionType, sectionId } = _editCtx;
       const changes = {};
       ['badge', 'label', 'content', 'bcMinorSummary', 'tabaSummary'].forEach(f => {
