@@ -346,7 +346,7 @@ let cardSeq    = 0;
 /* ════════════════════════════════════════════════════════════
    Password auth
    ════════════════════════════════════════════════════════════ */
-function storedToken() { return sessionStorage.getItem('adminToken') || ''; }
+function storedToken() { return localStorage.getItem('adminToken') || ''; }
 function authHeaders() { return { 'Authorization': `Bearer ${storedToken()}` }; }
 
 document.getElementById('login-form').addEventListener('submit', async e => {
@@ -363,7 +363,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
       headers: { 'Authorization': `Bearer ${pw}` },
     });
     if (res.ok) {
-      sessionStorage.setItem('adminToken', pw);
+      localStorage.setItem('adminToken', pw);
       await enterApp();
     } else if (res.status === 401) {
       errEl.textContent = 'Incorrect password.';
@@ -382,7 +382,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 });
 
 document.getElementById('logout-btn').addEventListener('click', () => {
-  sessionStorage.removeItem('adminToken');
+  localStorage.removeItem('adminToken');
   document.getElementById('admin-app').hidden  = true;
   document.getElementById('login-gate').hidden = false;
   document.getElementById('login-password').value = '';
@@ -398,7 +398,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
     });
     if (res.ok) { await enterApp(); return; }
   } catch { /* fall through to login gate */ }
-  sessionStorage.removeItem('adminToken');
+  localStorage.removeItem('adminToken');
 })();
 
 /* ════════════════════════════════════════════════════════════
