@@ -152,6 +152,39 @@ window.TABADivisions = {
             <li>Tadpole players must wear their regular team uniform when playing 11U games.</li>
             <li>Tadpole players are <strong>not allowed to pitch</strong> in 11U games.</li>
           </ul>`
+      },
+      {
+        id: "taba-11u-game-length",
+        insertAfterRule: "22",
+        title: "11U — Game Length & Time Limit",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <div class="callout blue">
+            <p><strong>No time limit applies to TABA 11U regular season games.</strong> The umpire may end the game due to darkness or unsafe field conditions at their discretion.</p>
+          </div>
+          <ul class="rl">
+            <li>All TABA 11U regular season games are <strong>6 innings</strong>, subject to the mercy rule (<a href="#22-08" class="bcm-link">BC Minor Rule 22.08</a>).</li>
+            <li><a href="#22-07" class="bcm-link">BC Minor Rule 22.07</a> imposes a 2-hour limit at 11U Provincial Championships only — it does not apply to TABA regular season games.</li>
+          </ul>`
+      },
+      {
+        id: "taba-11u-fair-play",
+        insertAfterRule: "25",
+        title: "11U — Fair Play Rule",
+        badge: "TABA Home/Host Rule",
+        content: `
+          <p>TABA 11U follows <a href="#rule-25" class="bcm-link">BC Minor Rule 25</a> in full. No TABA-specific modifications apply.</p>
+          <div class="callout red">
+            <p><strong>Failure to adhere to the Fair Play Rule</strong> results in a minimum game forfeiture and a minimum five-game suspension for the coach in charge (<a href="#25-00" class="bcm-link">Rule 25.00</a>).</p>
+          </div>
+          <div class="sub-rule">
+            <div class="sub-rule-title">Spring — <a href="#25-01" class="bcm-link">Rule 25.01</a></div>
+            <p>All players in attendance at league games must play at least <strong>three (3) complete innings</strong> of a six-inning game.</p>
+          </div>
+          <div class="sub-rule">
+            <div class="sub-rule-title">Summer — <a href="#25-02" class="bcm-link">Rule 25.02</a></div>
+            <p>No player may sit out for <strong>two consecutive innings</strong>. Upon re-entering defensively (except as pitcher), the player must complete one full defensive inning comprised of 3 outs or the opponent reaching the run maximum.</p>
+          </div>`
       }
     ]
   },
