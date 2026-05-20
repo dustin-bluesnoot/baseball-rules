@@ -988,93 +988,88 @@ window.TABADivisions = {
 
       "31.03": {
         type: "differs",
-        label: "9U TABA — Pitching Structure (Two Phases)",
-        bcMinorSummary: "BC Minor Rule 31.03 allows player pitching from 42 or 46 feet, one inning per player, max 35 pitches. All players may only pitch 1 inning per game.",
-        tabaSummary: "TABA uses a two-phase pitching structure split at the May long weekend. Before the May long weekend, coach/slinger pitches first 3; after, second-year players pitch first 3. In both phases, coach pitches the final 3. If the batter does not get a hit and a third strike is recorded, the batter is out.",
+        label: "9U TABA — Key Differences from BC Minor Rule 31",
+        bcMinorSummary: "BC Minor Rule 31.03 sets 4–6 inning games, a 2:15 inning cut-off, 3 outs or 4 runs per inning with a 10-run mercy, 9 fielders, a regulation hard ball, and player pitching from 42/46 ft.",
+        tabaSummary: "TABA 9U is a fully developmental format built to maximize hitting: 5-inning games, a 1:30 inning cut-off, 3 outs or 6 batters per half-inning, no score / no run limit / no mercy, 10 fielders (4 outfielders), 45cc baseballs, and a coach-operated pitching machine. Each row below cites the BC Minor 31.03 item it changes.",
         content: `
-          <div class="callout red">
-            <p><strong>TABA 9U pitching has two phases separated by the May long weekend.</strong> The structure ensures all batters get a fair chance to put the ball in play while introducing player pitching progressively through the season.</p>
-          </div>
-
-          <div class="sub-rule">
-            <div class="sub-rule-title">Phase 1 — Before May Long Weekend</div>
-            <table>
-              <thead><tr><th>Pitches</th><th>Who Pitches</th><th>If No Hit After 3 Pitches</th></tr></thead>
-              <tbody>
-                <tr><td class="hi">Pitches 1–3</td><td>The slinger (coach or designated helper)</td><td rowspan="2" style="vertical-align:middle;">If the batter has not made contact and pitch 6 is a third strike — <strong>batter is out</strong></td></tr>
-                <tr><td class="hi">Pitches 4–6</td><td>Coach</td></tr>
-              </tbody>
-            </table>
-            <p class="note">The slinger pitches from the standard 9U pitching distance. The batter gets up to 6 pitches total to put the ball in play.</p>
-          </div>
-
-          <div class="sub-rule">
-            <div class="sub-rule-title">Phase 2 — After May Long Weekend</div>
-            <table>
-              <thead><tr><th>Pitches</th><th>Who Pitches</th><th>If No Hit After 3 Pitches</th></tr></thead>
-              <tbody>
-                <tr><td class="hi">Pitches 1–3</td><td>A <strong>second-year TABA player</strong> (player who played 9U the previous year)</td><td rowspan="2" style="vertical-align:middle;">If the batter has not made contact and pitch 6 is a third strike — <strong>batter is out</strong></td></tr>
-                <tr><td class="hi">Pitches 4–6</td><td>Coach</td></tr>
-              </tbody>
-            </table>
-            <p class="note">Second-year players pitch from the standard 9U pitching distance. First-year players do not pitch in Phase 2 — this is a development opportunity for returning players. <a href="#31-03" class="bcm-link">BC Minor Rule 31.03</a> pitch count and inning limits still apply to player pitching in Phase 2.</p>
-          </div>
-
           <div class="callout navy">
-            <p><strong>Rule summary for both phases:</strong></p>
-            <ul class="rl">
-              <li>Batter receives up to <strong>6 pitches total</strong> (3 from pitcher/slinger, then 3 from coach).</li>
-              <li>If the batter makes contact at any point, normal play resumes.</li>
-              <li>If the batter does not make contact and a <strong>third strike is recorded on pitch 6 (or earlier)</strong>, the batter is out.</li>
-              <li>Foul balls on pitch 6 are not an out — the batter continues until a fair contact, a swing-and-miss third strike, or a called third strike.</li>
-            </ul>
-          </div>`
+            <p><strong>Guiding principle:</strong> TABA 9U is a developmental division. The goal is to <strong>maximize every player's opportunity to hit and put the ball in play</strong> — not to compete on score. Every difference below flows from that objective.</p>
+          </div>
+          <table>
+            <thead><tr><th>Topic</th><th>BC Minor Rule 31</th><th>TABA 9U Local Rule</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="hi">Game length</td>
+                <td>4 complete innings, maximum 6 <span class="sb-badge badge-bcm">31.03 (8)</span></td>
+                <td><strong>5 innings</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Time limit</td>
+                <td>No new inning after 2 hr 15 min <span class="sb-badge badge-bcm">31.03 (7)</span></td>
+                <td>No new inning after <strong>1 hr 30 min</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Half-inning ends</td>
+                <td>3 outs or 4 runs <span class="sb-badge badge-bcm">31.03 (12)</span></td>
+                <td><strong>3 outs or 6 batters</strong>, whichever comes first <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Run limit</td>
+                <td>4 runs per inning; 10 in the last <span class="sb-badge badge-bcm">31.03 (12)</span></td>
+                <td><strong>No run limit</strong> — the half-inning is capped by batters, not runs <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Score</td>
+                <td>Score &amp; run differential tracked <span class="sb-badge badge-bcm">31.03 (12), (16)</span></td>
+                <td><strong>No score kept</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Mercy rule</td>
+                <td>10-run mercy; home team last bats <span class="sb-badge badge-bcm">31.03 (16)</span></td>
+                <td><strong>No mercy rule</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Players on field</td>
+                <td>9 fielders per inning <span class="sb-badge badge-bcm">31.03 (9)</span></td>
+                <td><strong>10 fielders — 4 outfielders</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Baseball</td>
+                <td>Regulation hard ball <span class="sb-badge badge-bcm">31.03 (19)</span></td>
+                <td>Real baseballs — <strong>45cc</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Pitching</td>
+                <td>Players pitch from 42/46 ft; pitch &amp; inning limits <span class="sb-badge badge-bcm">31.03 (21)–(31), (35)</span></td>
+                <td><strong>Coach-operated pitching machine</strong> — players do not pitch (see detail below) <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Runners stop advancing</td>
+                <td>When the pitcher has the ball on the mound <span class="sb-badge badge-bcm">31.03 (32)</span></td>
+                <td>When the <strong>ball returns to the infield</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+              <tr>
+                <td class="hi">Overthrows</td>
+                <td>No 9U-specific overthrow rule</td>
+                <td><strong>No advancing on overthrows</strong> <span class="sb-badge badge-taba">TABA 9U</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">Every other part of <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> still applies unless changed above — including eligibility, line-ups, positional rotation <span class="sb-badge badge-bcm">31.03 (13)–(15)</span>, everyone bats <span class="sb-badge badge-bcm">31.03 (18)</span>, 60-ft base paths <span class="sb-badge badge-bcm">31.03 (20)</span>, no head-first sliding <span class="sb-badge badge-bcm">31.03 (36)</span>, bunting <span class="sb-badge badge-bcm">31.03 (37)</span>, and no running on a dropped third strike <span class="sb-badge badge-bcm">31.03 (38)</span>.</p>`
       }
     },
 
     additions: [
       {
-        id: "taba-9u-pitching-overview",
-        insertAfterRule: "31",
-        title: "9U TABA — Pitching Structure Overview",
+        id: "taba-9u-principle",
+        insertAfterRule: "1",
+        title: "9U — Purpose & Governing Rules",
         badge: "TABA 9U Only",
         content: `
           <div class="callout blue">
-            <p>TABA 9U uses a <strong>two-phase pitching structure</strong> through the season, designed to develop batting confidence early and introduce player pitching progressively.</p>
+            <p><strong>The goal of TABA 9U is to maximize every player's opportunity to hit and put the ball in play.</strong> It is a developmental, non-competitive format: no score is kept, there is no run limit, and there is no mercy rule.</p>
           </div>
-
-          <div class="sub-rule">
-            <div class="sub-rule-title">Phase 1 — Before May Long Weekend</div>
-            <ul class="rl">
-              <li>The <strong>slinger</strong> (a coach or designated helper) delivers the first <strong>3 pitches</strong>.</li>
-              <li>If the batter has not made contact after 3 pitches, the <strong>coach</strong> delivers the next <strong>3 pitches</strong>.</li>
-              <li>If the batter still has not made contact after all 6 pitches and a third strike is recorded — the <strong>batter is out</strong>.</li>
-            </ul>
-          </div>
-
-          <div class="sub-rule">
-            <div class="sub-rule-title">Phase 2 — After May Long Weekend</div>
-            <ul class="rl">
-              <li>A <strong>second-year TABA player</strong> (a player who played 9U the previous year) delivers the first <strong>3 pitches</strong>.</li>
-              <li>If the batter has not made contact after 3 pitches, the <strong>coach</strong> delivers the next <strong>3 pitches</strong>.</li>
-              <li>If the batter still has not made contact after all 6 pitches and a third strike is recorded — the <strong>batter is out</strong>.</li>
-              <li>First-year players do not pitch in Phase 2.</li>
-            </ul>
-          </div>
-
-          <div class="callout">
-            <p><strong>In both phases:</strong> If the batter makes contact at any point, normal play resumes per <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a>. Pitch count and inning limits from <a href="#31-03" class="bcm-link">Rule 31.03</a> apply to all player pitching in Phase 2.</p>
-          </div>
-
-          <p class="note">This rule has no equivalent in BC Minor Baseball Rule 31. It is a TABA-specific developmental rule. BC Minor Rule 31 governs all other aspects of 9U play.</p>`
-      },
-      {
-        id: "taba-9u-bcminor-note",
-        insertAfterRule: "1",
-        title: "9U — Governing Rules Overview",
-        badge: "TABA 9U Only",
-        content: `
-          <div class="callout red">
+          <div class="callout navy">
             <p><strong>Order of Precedence (highest to lowest):</strong></p>
             <ol class="nl">
               <li>TABA 9U Local Rules (this section)</li>
@@ -1082,7 +1077,31 @@ window.TABADivisions = {
               <li>Official Rules of Baseball</li>
             </ol>
           </div>
-          <p>All aspects of <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> apply to TABA 9U play unless specifically modified by a TABA local rule shown in this section. The primary TABA modification is the two-phase pitching structure — all other 9U rules follow BC Minor Rule 31 exactly.</p>`
+          <p>All of <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> applies to TABA 9U play except where a TABA local rule in this section changes it. The full list of differences is shown on <a href="#31-03" class="bcm-link">Rule 31.03</a> above.</p>`
+      },
+      {
+        id: "taba-9u-pitching-machine",
+        insertAfterRule: "31",
+        title: "9U — Pitching Machine (Coach-Operated)",
+        badge: "TABA 9U Only",
+        content: `
+          <div class="callout blue">
+            <p><strong>TABA 9U is played with a pitching machine operated by coaches. Players do not pitch.</strong> This replaces the player-pitching mechanics in <a href="#31-03" class="bcm-link">BC Minor Rule 31.03</a> — items (21)–(31) — and the leadoff / "ball must cross home plate" provision in item (35).</p>
+          </div>
+          <ul class="rl">
+            <li>A <strong>coach or designated helper from the batting team</strong> operates the machine.</li>
+            <li>Because there is no live pitcher, the player-pitching provisions of Rule 31.03 do not apply: pitch counts, innings-pitched limits, trips to the mound, hit-by-pitch awards, and balk/no-pitch rules are all <strong>not in effect</strong>.</li>
+          </ul>
+          <div class="callout red">
+            <p><strong>To be finalized before the season — per-batter mechanics not yet set:</strong></p>
+            <ul class="rl">
+              <li>Number of pitches (or swings) each batter receives from the machine.</li>
+              <li>Whether a batter can be struck out (and after how many pitches / swinging misses), or whether every batter hits until the ball is put in play.</li>
+              <li>Whether walks exist (with a machine there are normally no balls/walks).</li>
+              <li><strong>Base stealing:</strong> BC Minor 31.03 (30)/(31) allow stealing under live-pitcher conditions. With a machine and no score kept, TABA needs to decide whether stealing is allowed or banned at 9U.</li>
+            </ul>
+            <p class="note">These items interact with the "3 outs or 6 batters" half-inning cap, so they should be settled together.</p>
+          </div>`
       }
     ]
   }
