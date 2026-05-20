@@ -988,13 +988,42 @@ window.TABADivisions = {
 
       "31.03": {
         type: "differs",
-        label: "9U TABA — Key Differences from BC Minor Rule 31",
+        label: "9U TABA — Differs from BC Minor Rule 31",
         bcMinorSummary: "BC Minor Rule 31.03 sets 4–6 inning games, a 2:15 inning cut-off, 3 outs or 4 runs per inning with a 10-run mercy, 9 fielders, a regulation hard ball, and player pitching from 42/46 ft.",
-        tabaSummary: "TABA 9U is a fully developmental format built to maximize hitting: 5-inning games, a 1:30 inning cut-off, 3 outs or 6 batters per half-inning, no score / no run limit / no mercy, 10 fielders (4 outfielders), 45cc baseballs, and a coach-operated pitching machine. Each row below cites the BC Minor 31.03 item it changes.",
+        tabaSummary: "TABA 9U differs from Rule 31 in many areas. See the full side-by-side comparison in the 9U Local Rules section.",
         content: `
-          <div class="callout navy">
-            <p><strong>Guiding principle:</strong> TABA 9U is a developmental division. The goal is to <strong>maximize every player's opportunity to hit and put the ball in play</strong> — not to compete on score. Every difference below flows from that objective.</p>
+          <p>TABA 9U is a developmental format that differs from Rule 31 in several areas — game length, time limit, half-inning structure, scoring, fielders, the baseball used, pitching, and base running.</p>
+          <p>The full side-by-side comparison is in the <a href="#taba-9u-differences" class="bcm-link">9U Local Rules — Key Differences from BC Minor</a> section.</p>`
+      }
+    },
+
+    additions: [
+      {
+        id: "taba-9u-principle",
+        insertAfterRule: "1",
+        title: "9U — Purpose & Governing Rules",
+        badge: "TABA 9U Only",
+        content: `
+          <div class="callout blue">
+            <p><strong>The goal of TABA 9U is to maximize every player's opportunity to hit and put the ball in play.</strong> It is a developmental, non-competitive format: no score is kept, there is no run limit, and there is no mercy rule.</p>
           </div>
+          <div class="callout navy">
+            <p><strong>Order of Precedence (highest to lowest):</strong></p>
+            <ol class="nl">
+              <li>TABA 9U Local Rules (this section)</li>
+              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a> — in particular <a href="#rule-31" class="bcm-link">Rule 31: 9U Specific Rules</a></li>
+              <li>Official Rules of Baseball</li>
+            </ol>
+          </div>
+          <p>All of <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> applies to TABA 9U play except where a TABA local rule in this section changes it. The full list of differences is shown below.</p>`
+      },
+      {
+        id: "taba-9u-differences",
+        insertAfterRule: "1",
+        title: "9U — Key Differences from BC Minor",
+        badge: "TABA 9U Only",
+        content: `
+          <p>Each row cites the <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> item it changes. All other parts of Rule 31 continue to apply.</p>
           <table>
             <thead><tr><th>Topic</th><th>BC Minor Rule 31</th><th>TABA 9U Local Rule</th></tr></thead>
             <tbody>
@@ -1041,7 +1070,7 @@ window.TABADivisions = {
               <tr>
                 <td class="hi">Pitching</td>
                 <td>Players pitch from 42/46 ft; pitch &amp; inning limits <span class="sb-badge badge-bcm">31.03 (21)–(31), (35)</span></td>
-                <td><strong>Coach-operated pitching machine</strong> — players do not pitch (see detail below) <span class="sb-badge badge-taba">TABA 9U</span></td>
+                <td><strong>Coach-operated pitching machine</strong> — players do not pitch (see below) <span class="sb-badge badge-taba">TABA 9U</span></td>
               </tr>
               <tr>
                 <td class="hi">Runners stop advancing</td>
@@ -1055,29 +1084,7 @@ window.TABADivisions = {
               </tr>
             </tbody>
           </table>
-          <p class="note">Every other part of <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> still applies unless changed above — including eligibility, line-ups, positional rotation <span class="sb-badge badge-bcm">31.03 (13)–(15)</span>, everyone bats <span class="sb-badge badge-bcm">31.03 (18)</span>, 60-ft base paths <span class="sb-badge badge-bcm">31.03 (20)</span>, no head-first sliding <span class="sb-badge badge-bcm">31.03 (36)</span>, bunting <span class="sb-badge badge-bcm">31.03 (37)</span>, and no running on a dropped third strike <span class="sb-badge badge-bcm">31.03 (38)</span>.</p>`
-      }
-    },
-
-    additions: [
-      {
-        id: "taba-9u-principle",
-        insertAfterRule: "1",
-        title: "9U — Purpose & Governing Rules",
-        badge: "TABA 9U Only",
-        content: `
-          <div class="callout blue">
-            <p><strong>The goal of TABA 9U is to maximize every player's opportunity to hit and put the ball in play.</strong> It is a developmental, non-competitive format: no score is kept, there is no run limit, and there is no mercy rule.</p>
-          </div>
-          <div class="callout navy">
-            <p><strong>Order of Precedence (highest to lowest):</strong></p>
-            <ol class="nl">
-              <li>TABA 9U Local Rules (this section)</li>
-              <li><a href="#bcminor-rules-section" class="bcm-link">BC Minor Baseball Rules</a> — in particular <a href="#rule-31" class="bcm-link">Rule 31: 9U Specific Rules</a></li>
-              <li>Official Rules of Baseball</li>
-            </ol>
-          </div>
-          <p>All of <a href="#rule-31" class="bcm-link">BC Minor Rule 31</a> applies to TABA 9U play except where a TABA local rule in this section changes it. The full list of differences is shown on <a href="#31-03" class="bcm-link">Rule 31.03</a> above.</p>`
+          <p class="note">Unchanged and still in effect: eligibility, line-ups, positional rotation <span class="sb-badge badge-bcm">31.03 (13)–(15)</span>, everyone bats <span class="sb-badge badge-bcm">31.03 (18)</span>, 60-ft base paths <span class="sb-badge badge-bcm">31.03 (20)</span>, no head-first sliding <span class="sb-badge badge-bcm">31.03 (36)</span>, bunting <span class="sb-badge badge-bcm">31.03 (37)</span>, and no running on a dropped third strike <span class="sb-badge badge-bcm">31.03 (38)</span>.</p>`
       },
       {
         id: "taba-9u-pitching-machine",
